@@ -1,0 +1,109 @@
+.wrap { display: flex; flex-direction: column; gap: 20px; max-width: 680px; }
+.title {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -0.026em;
+  color: var(--color-text);
+  line-height: 1.15;
+}
+.title::before {
+  content: "";
+  display: inline-block;
+  width: 28px;
+  height: 2px;
+  background: var(--color-primary);
+  vertical-align: middle;
+  margin-right: 14px;
+  margin-bottom: 6px;
+}
+.subtitle {
+  color: var(--color-text-muted);
+  font-size: 14.5px;
+  margin-top: 12px;
+  line-height: 1.65;
+  max-width: 60ch;
+  letter-spacing: -0.003em;
+}
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.label { font-size: 13px; font-weight: 600; }
+.hint { font-size: 12px; color: var(--color-text-muted); }
+.inputRow { display: flex; align-items: center; gap: 6px; }
+.unit { font-size: 13px; color: var(--color-text-muted); white-space: nowrap; }
+.result {
+  background: var(--color-surface);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.resultTitle { font-size: 13px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted); }
+.resultPrice { font-size: 32px; font-weight: 800; color: var(--color-primary); }
+.resultMeta { display: flex; gap: 20px; font-size: 13px; color: var(--color-text-muted); }
+.profitBadge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.profitGood { background: var(--color-success-bg); color: var(--color-success); }
+.profitWarn { background: var(--color-warn-bg); color: var(--color-warn); }
+.profitBad  { background: var(--color-error-bg); color: var(--color-error); }
+.warnings { display: flex; flex-direction: column; gap: 8px; }
+.termsRow { display: flex; gap: 10px; }
+.termBtn {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all .12s;
+}
+.termBtn:hover { border-color: var(--color-primary); color: var(--color-primary); }
+.termBtnActive { border-color: var(--color-primary) !important; background: #eff6ff !important; color: var(--color-primary) !important; }
+
+/* Profit stress test table */
+.stressTable {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.stressTitle { font-size: 13px; font-weight: 600; }
+.stressGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  font-size: 13px;
+}
+.stressHeader {
+  background: var(--color-bg);
+  padding: 6px 10px;
+  font-weight: 700;
+  font-size: 11px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--color-border);
+}
+.stressCell {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
+}
+.stressGood { color: var(--color-success); font-weight: 700; }
+.stressWarn { color: var(--color-warn); font-weight: 700; }
+.stressBad  { color: var(--color-error); font-weight: 700; background: #fef2f2; }

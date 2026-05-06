@@ -1,0 +1,76 @@
+.wrap { display: flex; flex-direction: column; gap: 20px; max-width: 680px; }
+.title {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -0.026em;
+  color: var(--color-text);
+  line-height: 1.15;
+}
+.title::before {
+  content: "";
+  display: inline-block;
+  width: 28px;
+  height: 2px;
+  background: var(--color-primary);
+  vertical-align: middle;
+  margin-right: 14px;
+  margin-bottom: 6px;
+}
+.subtitle {
+  color: var(--color-text-muted);
+  font-size: 14.5px;
+  margin-top: 12px;
+  line-height: 1.65;
+  max-width: 60ch;
+  letter-spacing: -0.003em;
+}
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.fieldFull { grid-column: 1 / -1; }
+.label { font-size: 13px; font-weight: 600; }
+.required { color: var(--color-error); }
+.piPreview {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  font-size: 13px;
+  line-height: 1.8;
+  font-family: 'Courier New', monospace;
+  white-space: pre-wrap;
+}
+.piHeader { font-size: 16px; font-weight: 700; text-align: center; margin-bottom: 16px; }
+.warnings { display: flex; flex-direction: column; gap: 8px; }
+.depositBox {
+  background: var(--color-success-bg);
+  border: 1px solid #86efac;
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.depositTitle { font-weight: 700; color: var(--color-success); }
+.depositRow { font-size: 13px; display: flex; gap: 10px; }
+.depositLabel { color: var(--color-text-muted); min-width: 80px; }
+
+/* Pre-send checklist */
+.checklist {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.checklistTitle { font-size: 13px; font-weight: 700; }
+.checkRow {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 13px;
+  cursor: pointer;
+  line-height: 1.5;
+}

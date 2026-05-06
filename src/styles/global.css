@@ -1,0 +1,216 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* ─────────────────────────────────────────────────────────
+     EDITORIAL TRADE — 2025 warm-neutral palette
+     Cream parchment base · deep petrol primary · burnt sienna alert
+     Quiet-luxury inspired, professional, distinctly non-generic.
+  ───────────────────────────────────────────────────────── */
+
+  /* Surfaces — warm parchment, never sterile gray */
+  --color-bg:           #F5F2EB;     /* warm cream, base */
+  --color-bg-2:         #EFEBE0;     /* slightly deeper cream for layering */
+  --color-surface:      #FCFAF6;     /* card surface — paper white */
+  --color-surface-2:    #F8F4EB;     /* alt card — softer */
+  --color-surface-elev: #FFFFFF;     /* highest elevation, pure white */
+
+  /* Borders — muted warm */
+  --color-border:        #E5DECF;
+  --color-border-strong: #D4CCB8;
+  --color-divider:       #EFEAE0;
+
+  /* Text — warm off-blacks, never #000 */
+  --color-text:           #1A1714;   /* near-black, warm */
+  --color-text-secondary: #3F3A33;
+  --color-text-muted:     #6E665A;   /* warm gray, not cold */
+  --color-text-subtle:    #9C9485;
+
+  /* PRIMARY — deep petrol/teal (mature, trade-evoking, not generic blue) */
+  --color-primary:        #0F4C5C;
+  --color-primary-hover:  #093945;
+  --color-primary-soft:   #E2EAEB;
+  --color-primary-ring:   rgba(15, 76, 92, 0.18);
+
+  /* ACCENT — burnt sienna (used for highlights, never combined with primary at full saturation) */
+  --color-accent:         #C44536;
+  --color-accent-soft:    #F8E4DF;
+
+  /* Semantic — desaturated, earth-tone aligned */
+  --color-success:        #4F7942;       /* sage green */
+  --color-success-bg:     #EEF1E5;
+  --color-success-border: #C9D3B0;
+  --color-warn:           #B57B26;       /* amber */
+  --color-warn-bg:        #FBF1DC;
+  --color-warn-border:    #ECD7A3;
+  --color-error:          #A53A2A;       /* burnt brick */
+  --color-error-bg:       #F8E4DF;
+  --color-error-border:   #E8B5AC;
+  --color-info:           #0F4C5C;
+  --color-info-bg:        #E2EAEB;
+  --color-info-border:    #B5C9CD;
+
+  /* Radii — soft editorial */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+
+  /* Shadows — warm-tinted diffusion (color matches bg) */
+  --shadow-xs: 0 1px 2px rgba(58, 42, 25, 0.04);
+  --shadow-sm: 0 2px 8px -2px rgba(58, 42, 25, 0.06), 0 1px 2px rgba(58, 42, 25, 0.04);
+  --shadow-md: 0 8px 24px -10px rgba(58, 42, 25, 0.10), 0 2px 6px -2px rgba(58, 42, 25, 0.05);
+  --shadow-lg: 0 24px 48px -16px rgba(58, 42, 25, 0.14), 0 8px 16px -8px rgba(58, 42, 25, 0.06);
+  --shadow-inset-top: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+
+  /* Easing tokens */
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-soft:   cubic-bezier(0.4, 0.0, 0.2, 1);
+
+  /* Type system — Manrope (body) + Fraunces (display) */
+  --font-display: 'Fraunces', 'Songti SC', 'STSong', Georgia, serif;
+  --font-sans: 'Manrope', ui-sans-serif, -apple-system, BlinkMacSystemFont,
+               'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+
+  font-family: var(--font-sans);
+  font-feature-settings: 'cv11', 'ss01', 'ss03', 'liga';
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-text);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Subtle grain on the body bg — adds editorial paper feel (fixed layer, no scroll repaint) */
+body {
+  min-height: 100dvh;
+  position: relative;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.32;
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgba(58,42,25,0.08), transparent),
+    radial-gradient(1px 1px at 80% 70%, rgba(58,42,25,0.06), transparent),
+    radial-gradient(1px 1px at 50% 80%, rgba(58,42,25,0.05), transparent);
+  background-size: 220px 220px, 180px 180px, 140px 140px;
+  mix-blend-mode: multiply;
+}
+
+#root {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+}
+
+/* Display — Fraunces editorial serif for big titles only */
+.display, .titleDisplay {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  font-feature-settings: 'ss01', 'ss02', 'ss05';
+}
+
+/* Mono — for numbers / data density */
+.mono, code, pre, kbd, samp {
+  font-family: var(--font-mono);
+  font-feature-settings: 'zero', 'ss01';
+}
+
+.tabular, [data-tabular] {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  border: none;
+  outline: none;
+  color: inherit;
+  background: transparent;
+  -webkit-tap-highlight-color: transparent;
+}
+button:disabled { opacity: 0.42; cursor: not-allowed; }
+button:focus-visible {
+  outline: 2px solid var(--color-primary-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+input, textarea, select {
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 9px 13px;
+  width: 100%;
+  background: var(--color-surface-elev);
+  outline: none;
+  transition: border-color .2s var(--ease-out), box-shadow .2s var(--ease-out);
+}
+input:hover, textarea:hover, select:hover { border-color: var(--color-border-strong); }
+input:focus, textarea:focus, select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-ring);
+}
+input::placeholder, textarea::placeholder { color: var(--color-text-subtle); }
+textarea { resize: vertical; line-height: 1.65; }
+
+input[type="checkbox"], input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+h1, h2, h3, h4 {
+  font-weight: 600;
+  letter-spacing: -0.014em;
+  color: var(--color-text);
+}
+h1 { letter-spacing: -0.024em; font-weight: 700; }
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color .15s var(--ease-out);
+}
+a:hover { color: var(--color-primary-hover); }
+
+::selection { background: var(--color-primary-soft); color: var(--color-primary-hover); }
+
+/* Scrollbar — refined warm */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-subtle);
+  background-clip: padding-box;
+  border: 2px solid transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

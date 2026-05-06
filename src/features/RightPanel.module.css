@@ -1,0 +1,183 @@
+.panel {
+  width: 300px;
+  min-width: 300px;
+  background: transparent;
+  border-left: 1px solid var(--color-border);
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  overflow-y: auto;
+}
+
+.section { display: flex; flex-direction: column; gap: 14px; }
+.sectionTitle {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--color-text-subtle);
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+/* Score — editorial hero metric with serif */
+.score {
+  font-family: var(--font-display);
+  font-size: 56px;
+  font-weight: 500;
+  color: var(--color-text);
+  text-align: center;
+  padding: 8px 0 0;
+  line-height: 1;
+  letter-spacing: -0.045em;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum', 'ss01';
+}
+.scoreLabel {
+  font-size: 10.5px;
+  color: var(--color-text-subtle);
+  text-align: center;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+.scoreHistory {
+  display: flex;
+  flex-direction: column;
+  margin-top: 6px;
+}
+.scoreItem {
+  font-size: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  padding: 9px 0;
+  border-top: 1px solid var(--color-divider);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+.scoreItem:first-child { border-top: none; }
+.scorePos {
+  color: var(--color-success);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  min-width: 32px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+}
+.scoreNeg {
+  color: var(--color-error);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  min-width: 32px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+}
+
+/* Customer info — table-like with dividers */
+.kv {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--color-divider);
+}
+.kvRow {
+  display: flex;
+  gap: 14px;
+  font-size: 13px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-divider);
+  align-items: baseline;
+}
+.kvLabel {
+  color: var(--color-text-muted);
+  min-width: 56px;
+  font-size: 11.5px;
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+}
+.kvValue {
+  color: var(--color-text);
+  font-weight: 500;
+  flex: 1;
+  word-break: break-word;
+  letter-spacing: -0.005em;
+}
+
+/* Risk badges — cleaner with left accent */
+.riskList { display: flex; flex-direction: column; gap: 8px; }
+.riskItem {
+  font-size: 12px;
+  line-height: 1.6;
+  padding: 10px 13px;
+  border-radius: var(--radius-md);
+  border: 1px solid;
+  border-left-width: 3px;
+}
+.riskError {
+  background: var(--color-error-bg);
+  border-color: var(--color-error-border);
+  border-left-color: var(--color-error);
+  color: #7a2a1f;
+}
+.riskWarn {
+  background: var(--color-warn-bg);
+  border-color: var(--color-warn-border);
+  border-left-color: var(--color-warn);
+  color: #7c521a;
+}
+.riskInfo {
+  background: var(--color-info-bg);
+  border-color: var(--color-info-border);
+  border-left-color: var(--color-info);
+  color: #093945;
+}
+
+.empty {
+  color: var(--color-text-subtle);
+  font-size: 12px;
+  font-style: italic;
+  padding: 4px 0;
+}
+
+.riskSummary { display: flex; flex-direction: column; gap: 6px; }
+.riskBadge {
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Tasks — refined dots with breathing animation */
+.taskList { display: flex; flex-direction: column; gap: 11px; }
+.task {
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+.taskDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-border-strong);
+  margin-top: 7px;
+  flex-shrink: 0;
+}
+.taskDotDone {
+  background: var(--color-success);
+  box-shadow: 0 0 0 3px rgba(79, 121, 66, 0.16);
+}
+.taskDotPending {
+  background: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(196, 69, 54, 0.18);
+  animation: pulse 2.4s var(--ease-out) infinite;
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(196, 69, 54, 0.18); }
+  50%      { box-shadow: 0 0 0 5px rgba(196, 69, 54, 0.26); }
+}

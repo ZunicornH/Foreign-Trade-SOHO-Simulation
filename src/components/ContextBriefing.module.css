@@ -1,0 +1,175 @@
+.wrap { display: flex; flex-direction: column; gap: 0; }
+
+.briefing {
+  background: var(--color-surface-elev);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 26px 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 28px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+.briefing::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--color-primary) 0%,
+    var(--color-accent) 60%,
+    transparent 100%
+  );
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-bottom: 4px;
+}
+
+.stageBadge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  border: 1px solid var(--color-info-border);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
+}
+
+.stageTitle {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.018em;
+  color: var(--color-text);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 13px 16px;
+  background: var(--color-bg-2);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-md);
+}
+
+.sectionWarn {
+  background: var(--color-warn-bg);
+  border-color: var(--color-warn-border);
+  border-left: 3px solid var(--color-warn);
+}
+
+.sectionLabel {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+
+.sectionWarn .sectionLabel { color: #7c521a; }
+
+.sectionText {
+  font-size: 13.5px;
+  line-height: 1.72;
+  color: var(--color-text-secondary);
+  letter-spacing: -0.003em;
+}
+
+.impactChain {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.impactItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+  flex-wrap: wrap;
+}
+
+.impactFrom {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  padding: 3px 11px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 11.5px;
+  letter-spacing: -0.005em;
+  border: 1px solid var(--color-info-border);
+}
+
+.impactArrow {
+  color: var(--color-text-subtle);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.impactTo {
+  color: var(--color-text-secondary);
+  font-size: 12.5px;
+}
+
+.ackBtn {
+  background: var(--color-primary);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 11px 24px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  cursor: pointer;
+  transition: all .2s var(--ease-out);
+  align-self: flex-start;
+  box-shadow:
+    0 1px 2px rgba(15, 76, 92, 0.18),
+    var(--shadow-inset-top);
+  margin-top: 4px;
+  font-family: inherit;
+}
+.ackBtn:hover {
+  background: var(--color-primary-hover);
+  box-shadow:
+    0 6px 18px -6px rgba(15, 76, 92, 0.42),
+    var(--shadow-inset-top);
+}
+.ackBtn:active { transform: translateY(1px); }
+
+.opArea { display: flex; flex-direction: column; gap: 18px; }
+
+.revealBtn {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 7px 14px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  margin-bottom: 18px;
+  align-self: flex-start;
+  transition: all .18s var(--ease-out);
+  box-shadow: var(--shadow-xs);
+  letter-spacing: 0.01em;
+}
+.revealBtn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}

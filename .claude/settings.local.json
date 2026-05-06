@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create *)",
+      "PowerShell(cd \"E:\\\\File\\\\AI Project\\\\Claude\\\\1. Foreign trade SOHO Agent\"; echo y | npm create vite@latest . -- --template react 2>&1)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "mcp__Claude_Preview__preview_start",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "mcp__Claude_in_Chrome__browser_batch",
+      "Bash(start chrome *)",
+      "Bash(mv taste-skill/skills/taste-skill ./taste-skill-core)",
+      "Bash(rm -rf taste-skill andrej-karpathy-skills superpowers)",
+      "Bash(netstat -ano)",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
+    ]
+  }
+}
