@@ -172,7 +172,6 @@ export default async function handler(req) {
         stream: false,
         max_tokens: 2800,
         temperature: 0.7,
-        response_format: { type: 'json_object' },
       }),
       // 45s fits within Vercel Edge Function max duration; original 60s risked timeout.
       signal: AbortSignal.timeout(45_000),

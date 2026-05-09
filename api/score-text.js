@@ -71,7 +71,6 @@ Output schema (strict JSON, no extra keys):
         stream: false,
         max_tokens: 400,
         temperature: 0.3,
-        response_format: { type: 'json_object' },
       }),
       signal: AbortSignal.timeout(28_000),
     });

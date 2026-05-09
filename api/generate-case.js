@@ -128,7 +128,6 @@ Generate the training case context.`;
         stream: false,
         max_tokens: 1500,
         temperature: 0.7,
-        response_format: { type: 'json_object' },
       }),
       signal: AbortSignal.timeout(45_000),
     });
