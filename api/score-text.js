@@ -3,7 +3,7 @@
 // Body: { rubric: { dimensions: [{key,label,weight}], context: string }, text: string }
 // Response: { dim_key: { score: 0|0.5|1, hint: string }, ... }
 
-export const config = { runtime: 'edge' };
+export const config = { maxDuration: 60 };
 
 import { getCorsHeaders, handlePreflight, checkAuth, jsonCors } from './_shared.js';
 
