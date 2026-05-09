@@ -388,7 +388,7 @@ Best regards,
                   <>
                     <div>
                       <div className={styles.templateLabel}>推荐回复参考</div>
-                      <div className={styles.template}>{INQUIRY_REPLY_TEMPLATE}</div>
+                      <div className={styles.template}>{inquiryReplyTemplate}</div>
                     </div>
 
                     <div className={styles.editorLayout}>
