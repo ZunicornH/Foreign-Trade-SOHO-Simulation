@@ -6,7 +6,7 @@
 // Body: { caseContext, product, targetMarket, usp }
 // Response: see SCHEMA in src/lib/stageMaterials.js for shape.
 
-export const config = { runtime: 'edge' };
+export const config = { maxDuration: 60 };
 
 import { getCorsHeaders, handlePreflight, checkAuth, jsonCors } from './_shared.js';
 
