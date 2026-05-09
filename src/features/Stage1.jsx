@@ -5,8 +5,14 @@ import AlertBox from '../components/AlertBox.jsx';
 import ContextBriefing from '../components/ContextBriefing.jsx';
 import DecisionQuiz from '../components/DecisionQuiz.jsx';
 import DimensionFeedback from '../components/DimensionFeedback.jsx';
-import { useAppState, useAppDispatch } from '../lib/StateContext.jsx';
+import LLMScorePanel from '../components/LLMScorePanel.jsx';
+import CaseGenerationCard from '../components/CaseGenerationCard.jsx';
+import { useAppState, useAppDispatch, useTrackTokens } from '../lib/StateContext.jsx';
 import { PRINCIPLES } from '../lib/principles.js';
+import { generateCase, generateStageMaterials } from '../lib/llm.js';
+import { normalizeCaseContext } from '../lib/caseContext.js';
+import { normalizeStageMaterials } from '../lib/stageMaterials.js';
+import { getRubric } from '../lib/scoringRubrics.js';
 
 const BATTERY_LIQUID = ['电池', '锂电', '液体', '喷雾', '气雾', '充电'];
 
@@ -49,6 +55,7 @@ function analyzeUsp(usp) {
 export default function Stage1() {
   const state = useAppState();
   const dispatch = useAppDispatch();
+  const trackTokens = useTrackTokens();
   const [tc, setTc] = useState(state.trainingCase);
   const [warnings, setWarnings] = useState([]);
 
@@ -68,7 +75,7 @@ export default function Stage1() {
     return w;
   }
 
-  function handleConfirm() {
+  async function handleGenerate() {
     // Check for generic USP — hard stop
     const uspLower = tc.usp.toLowerCase();
     if (GENERIC_USP_WORDS.some(w => uspLower.includes(w))) {
@@ -79,7 +86,45 @@ export default function Stage1() {
     const w = validate(tc);
     setWarnings(w);
     if (!tc.product.trim() || !tc.targetMarket.trim() || !tc.usp.trim()) return;
+
     dispatch({ type: 'SET_TRAINING_CASE', payload: tc });
+    dispatch({ type: 'SET_CASE_GENERATING', value: true });
+
+    let normalized = null;
+    try {
+      const raw = await generateCase({
+        product: tc.product,
+        targetMarket: tc.targetMarket,
+        usp: tc.usp,
+        onUsage: trackTokens,
+      });
+      normalized = normalizeCaseContext(raw);
+      dispatch({ type: 'SET_CASE_CONTEXT', payload: normalized });
+    } catch (err) {
+      dispatch({ type: 'SET_CASE_ERROR', error: err.message || String(err) });
+      return; // skip materials gen if foundation failed
+    }
+
+    // Phase B: kick off stage materials generation in background.
+    // User can read the case card while this runs; usually done by the time they click "进入阶段 2".
+    dispatch({ type: 'SET_MATERIALS_GENERATING', value: true });
+    try {
+      const rawMat = await generateStageMaterials({
+        caseContext: normalized,
+        product: tc.product,
+        targetMarket: tc.targetMarket,
+        usp: tc.usp,
+        onUsage: trackTokens,
+      });
+      const normalizedMat = normalizeStageMaterials(rawMat);
+      dispatch({ type: 'SET_STAGE_MATERIALS', payload: normalizedMat });
+    } catch (err) {
+      // Non-fatal — fall back to FALLBACK_MATERIALS in stage components
+      dispatch({ type: 'SET_MATERIALS_ERROR', error: err.message || String(err) });
+    }
+  }
+
+  function handleProceed() {
     dispatch({ type: 'SET_STAGE', stage: 2 });
   }
 
@@ -108,9 +153,15 @@ export default function Stage1() {
           <div className={styles.field}>
             <label className={styles.label}>差异化卖点 <span style={{ color: 'var(--color-error)' }}>*</span></label>
             <div className={styles.hint}>至少填写 1 条，如认证、材质、外观、功能等。越具体越有力。</div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 220px', gap: 12, alignItems: 'flex-start' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 260px', gap: 12, alignItems: 'flex-start' }}>
               <textarea rows={3} value={tc.usp} onChange={(e) => handleChange('usp', e.target.value)} placeholder="例：LFGB 认证、无 BPA、哑光喷漆定制色（12色）、304不锈钢" />
-              <DimensionFeedback dimensions={uspDims} />
+              <LLMScorePanel
+                text={tc.usp}
+                rubric={getRubric('usp_quality', state)}
+                fallbackDims={uspDims}
+                cacheKey={state.caseContext ? 'with-case' : 'no-case'}
+                minLength={10}
+              />
             </div>
           </div>
         </div>
@@ -140,10 +191,37 @@ export default function Stage1() {
 
         {warnings.map((w, i) => <AlertBox key={i} level={w.level} msg={w.msg} />)}
 
+        {/* Case generation result — shown after user clicks "Generate" */}
+        {(state.caseGenerating || state.caseContext || state.caseError) && (
+          <CaseGenerationCard
+            loading={state.caseGenerating}
+            error={state.caseError}
+            caseContext={state.caseContext}
+            onRetry={handleGenerate}
+            materialsLoading={state.materialsGenerating}
+            materialsReady={!!state.stageMaterials}
+            materialsError={state.materialsError}
+          />
+        )}
+
         <div className={styles.actions}>
-          <Button onClick={handleConfirm} disabled={!tc.product.trim() || !tc.targetMarket.trim() || !tc.usp.trim()}>
-            确认并进入阶段 2 →
-          </Button>
+          {!state.caseContext ? (
+            <Button
+              onClick={handleGenerate}
+              disabled={
+                !tc.product.trim() ||
+                !tc.targetMarket.trim() ||
+                !tc.usp.trim() ||
+                state.caseGenerating
+              }
+            >
+              {state.caseGenerating ? '生成中…' : '生成训练案例 ✨'}
+            </Button>
+          ) : (
+            <Button onClick={handleProceed}>
+              确认并进入阶段 2 →
+            </Button>
+          )}
           <button className={styles.skipLink} onClick={handleSkip}>跳过，使用默认数据</button>
         </div>
 

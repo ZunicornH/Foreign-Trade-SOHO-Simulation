@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import styles from './Stage7.module.css';
 import Button from '../components/Button.jsx';
 import AlertBox from '../components/AlertBox.jsx';
@@ -6,29 +6,8 @@ import ContextBriefing from '../components/ContextBriefing.jsx';
 import DecisionQuiz from '../components/DecisionQuiz.jsx';
 import { useAppState, useAppDispatch } from '../lib/StateContext.jsx';
 import { checkPI } from '../lib/rules.js';
-
-const HS_QUIZ_OPTIONS = [
-  {
-    label: '3924.10.00 — 塑料餐具及厨房用具',
-    correct: false,
-    explanation: '错误。这个编码适用于塑料制品。保温杯是不锈钢材质，归入金属制家用器皿类。HS 编码按材质分类，填错会影响关税税率计算，德国海关可能扣货查验。',
-  },
-  {
-    label: '7323.93.90 — 不锈钢家用器皿',
-    correct: true,
-    explanation: '正确！7323 是"金属制家用器皿"章节，93 对应不锈钢，90 是其他细分。德国对此类产品关税约 3%。HS 编码一旦写错，可能面临：①买家清关延迟；②补缴关税差额；③与 Stage 8 提单不符导致退关。始终与货代确认最新版本。',
-  },
-  {
-    label: '8418.99.00 — 制冷设备及零件',
-    correct: false,
-    explanation: '错误。8418 是制冷/冷冻设备的编码，保温杯不含机械制冷功能，不适用。HS 编码错误是外贸新手最常见的 PI 错误之一，轻则延误清关，重则按错误税率征税。',
-  },
-  {
-    label: '4419.90.00 — 木制餐具',
-    correct: false,
-    explanation: '错误。4419 是木制品。这说明 HS 编码首先按材质区分——不锈钢制品一定在 7300 系列。不确定时联系货代，他们有专业数据库可以查询。',
-  },
-];
+import { getActiveMaterials } from '../lib/stageMaterials.js';
+import { getActiveCase } from '../lib/caseContext.js';
 
 const PRE_SEND_CHECKS = [
   { id: 'desc_match', label: 'PI 产品描述与之前邮件中描述一致（无笔误/规格矛盾）' },
@@ -42,13 +21,37 @@ export default function Stage7() {
   const neg = state.negotiation;
   const agreedPrice = neg.agreedPrice || state.quoteDraft.finalPriceUSD || 0;
 
+  const materials = getActiveMaterials(state);
+  const caseCtx = getActiveCase(state);
+
   // Check if BEC principle was seen in Stage 6
   const becAcknowledged = state.principleAcks?.some((a) => a.id === 'PRINCIPLE_BEC') ||
     state.scenarioResults?.SCENARIO_BEC_ATTACK?.outcome === 'GOOD';
 
+  // HS quiz from materials → DecisionQuiz options
+  const hsQuizOptions = useMemo(() => {
+    return (materials.hsCodeQuiz?.options || []).map((opt) => ({
+      label: `${opt.code} — ${opt.name}`,
+      correct: !!opt.correct,
+      explanation: opt.explanation || (opt.correct
+        ? '正确！'
+        : '错误。HS 编码按材质 / 用途分类，填错会影响关税税率，海关可能扣货查验。'),
+    }));
+  }, [materials]);
+
+  const hsQuizQuestion = materials.hsCodeQuiz?.question
+    || '以下哪个 HS 编码最准确地描述你的产品？';
+
+  // Extract a representative HS placeholder from caseContext.hsCodeRange (e.g. "7323.93.x for stainless kitchenware")
+  const hsCodePlaceholder = useMemo(() => {
+    const range = caseCtx?.hsCodeRange || '';
+    const match = range.match(/(\d{4}[.]\d{2}[.\dx]*)/);
+    return match ? `例：${match[1].replace(/x/g, '0')}` : '例：7323930000';
+  }, [caseCtx]);
+
   const [form, setForm] = useState({
-    productDesc: state.piDraft.productDesc || '不锈钢保温杯 500ml，双层真空，304不锈钢，BPA-free',
-    spec: state.piDraft.spec || 'Ø70×H220mm, 280g, 304 stainless steel inner & outer',
+    productDesc: state.piDraft.productDesc || materials.piDefaults?.productDesc || '',
+    spec: state.piDraft.spec || materials.piDefaults?.spec || '',
     qty: state.piDraft.qty || '500',
     unitPrice: state.piDraft.unitPrice || agreedPrice.toFixed(2),
     totalPrice: state.piDraft.totalPrice || (agreedPrice * 500).toFixed(2),
@@ -150,11 +153,11 @@ Bank Account: ${form.bankAccount || '—'}
 
         {!piSent ? (
           <>
-            {/* HS Code quiz */}
+            {/* HS Code quiz — generated from caseContext */}
             <DecisionQuiz
               quizId="STAGE7_HS_QUIZ"
-              question="你正在出口不锈钢保温杯（500ml，双层真空，无电子元件）。以下哪个 HS 编码最准确？"
-              options={HS_QUIZ_OPTIONS}
+              question={hsQuizQuestion}
+              options={hsQuizOptions}
             />
 
             {/* BEC reminder — show if not yet acknowledged */}
@@ -169,15 +172,15 @@ Bank Account: ${form.bankAccount || '—'}
             <div className={styles.grid}>
               <div className={`${styles.field} ${styles.fieldFull}`}>
                 <label className={styles.label}>产品描述 <span className={styles.required}>*</span></label>
-                <input value={form.productDesc} onChange={(e) => set('productDesc', e.target.value)} placeholder="例：不锈钢保温杯 500ml，双层真空" />
+                <input value={form.productDesc} onChange={(e) => set('productDesc', e.target.value)} placeholder={`例：${materials.piDefaults?.productDesc || caseCtx?.product || ''}`} />
               </div>
               <div className={`${styles.field} ${styles.fieldFull}`}>
                 <label className={styles.label}>产品规格</label>
-                <input value={form.spec} onChange={(e) => set('spec', e.target.value)} placeholder="例：Ø70×H220mm, 280g, 304SS" />
+                <input value={form.spec} onChange={(e) => set('spec', e.target.value)} placeholder={`例：${materials.piDefaults?.spec || 'dimensions, weight, key materials'}`} />
               </div>
               <div className={styles.field}>
                 <label className={styles.label}>HS 编码 <span className={styles.required}>*</span></label>
-                <input value={form.hsCode} onChange={(e) => set('hsCode', e.target.value)} placeholder="例：7323930000" />
+                <input value={form.hsCode} onChange={(e) => set('hsCode', e.target.value)} placeholder={hsCodePlaceholder} />
               </div>
               <div className={styles.field}>
                 <label className={styles.label}>贸易条款</label>

@@ -1,16 +1,18 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-06T08:30:41.222Z
-> Files: 64 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-09T09:30:11.233Z
+> Files: 86 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
-- `.gitignore` — Git ignore rules (~20 tok)
+- `.gitignore` — Git ignore rules (~23 tok)
 - `CLAUDE.md` — OpenWolf (~57 tok)
 - `index.html` — 外贸 SOHO 模拟训练工作台 (~201 tok)
 - `package-lock.json` — npm lock file (~16041 tok)
 - `package.json` — Node.js package manifest (~103 tok)
-- `vite.config.js` — Vite build configuration (~38 tok)
+- `README.md` — Project documentation (~686 tok)
+- `vercel.json` (~42 tok)
+- `vite.config.js` — Local dev plugin: loads `api/*.js` Edge-style handlers and mounts them (~1045 tok)
 
 ## .claude/
 
@@ -24,7 +26,22 @@
 
 ## C:/Users/20443/.claude/plans/
 
+- `docs-v3-overview-md-skill-token-dynamic-quail.md` — Token 节省最佳方案分析 (~933 tok)
+- `https-github-com-garrytan-gstack-skill-playful-flurry.md` — 计划：安装 gstack skill 到项目 (~475 tok)
 - `https-vercel-com-docs-agent-resources-s-functional-teacup.md` — Plan: 初始化 Git 仓库并推送到 GitHub (~156 tok)
+- `soho-breezy-beacon-md-v2-soho-soho-lazy-hippo.md` — 外贸 SOHO 模拟训练工作台 — v3 完整更新计划 (~4018 tok)
+
+## api/
+
+- `_shared.js` — Build CORS response headers. (~442 tok)
+- `buyer-chat.js` — Vercel Edge Function — streams buyer dialogue from DeepSeek back to client (SSE). (~2751 tok)
+- `generate-case.js` — Vercel Edge Function — given product + targetMarket + usp, generates a complete training case contex (~1913 tok)
+- `generate-stage-materials.js` — Vercel Edge Function — given a generated caseContext, produces all stage-specific (~2645 tok)
+- `score-text.js` — Vercel Edge Function — scores a piece of user text against a rubric, returns JSON. (~1208 tok)
+
+## docs/
+
+- `v3-overview.md` — 外贸 SOHO 模拟训练工作台 — v3 项目总览 (~2205 tok)
 
 ## src/
 
@@ -40,21 +57,27 @@
 - `Button.module.css` — Styles: 12 rules (~538 tok)
 - `Card.jsx` — Card (~73 tok)
 - `Card.module.css` — Styles: 2 rules (~95 tok)
+- `CaseGenerationCard.jsx` — Renders the generated training case so the user can verify it before proceeding. (~1393 tok)
+- `CaseGenerationCard.module.css` — Styles: 42 rules (~1788 tok)
 - `ContextBriefing.jsx` — ContextBriefing — uses useState (~687 tok)
 - `ContextBriefing.module.css` — Styles: 22 rules (~1042 tok)
 - `DecisionQuiz.jsx` — Props: (~950 tok)
 - `DecisionQuiz.module.css` — Styles: 28 rules (~1163 tok)
 - `DimensionFeedback.jsx` — Props: (~289 tok)
 - `DimensionFeedback.module.css` — Styles: 9 rules (~333 tok)
+- `LLMScorePanel.jsx` — LLM-powered scoring panel. Wraps DimensionFeedback with: (~1386 tok)
+- `LLMScorePanel.module.css` — Styles: 11 rules (~552 tok)
 - `PrincipleModal.jsx` — PrincipleModal (~455 tok)
 - `PrincipleModal.module.css` — Styles: 22 rules (~962 tok)
+- `StreamingMessage.jsx` — Editorial buyer-bubble component for LLM-streamed dialogue. (~774 tok)
+- `StreamingMessage.module.css` — Styles: 18 rules (~851 tok)
 
 ## src/data/
 
 - `briefings.js` — ContextBriefing content — shown before each stage's operation area. (~1180 tok)
 - `guideContent.js` — Per-stage learning guide content and post-stage case review content (~1508 tok)
-- `scenarios.js` — Scenario definitions for ScenarioInjector (~1070 tok)
-- `seed.js` — Exports SEED_STATE, BUYER_SCRIPTS (~1274 tok)
+- `scenarios.js` — Build a Stage 2 cert-risk scenario tailored to the current case. (~1987 tok)
+- `seed.js` — Exports SEED_STATE, BUYER_SCRIPTS (~1590 tok)
 
 ## src/features/
 
@@ -64,33 +87,38 @@
 - `InlineRiskBar.module.css` — Styles: 11 rules, 1 animations (~327 tok)
 - `LearningGuide.jsx` — LearningGuide — uses useState (~442 tok)
 - `LearningGuide.module.css` — Styles: 12 rules (~646 tok)
-- `RightPanel.jsx` — ScoreItem (~1924 tok)
+- `RightPanel.jsx` — ScoreItem (~2131 tok)
 - `RightPanel.module.css` — Styles: 28 rules (~1155 tok)
-- `Stage1.jsx` — BATTERY_LIQUID — uses useState (~1647 tok)
+- `Stage1.jsx` — BATTERY_LIQUID (~2470 tok)
 - `Stage1.module.css` — Styles: 11 rules (~422 tok)
-- `Stage2.jsx` — Stage2 — uses useState (~2704 tok)
-- `Stage34.jsx` — PROSPECTING_TEMPLATE — uses useState (~4818 tok)
+- `Stage2.jsx` — QC_LABELS (~3495 tok)
+- `Stage34.jsx` — Stage34 (~5871 tok)
 - `Stage34.module.css` — Styles: 22 rules (~685 tok)
-- `Stage5.jsx` — DEFAULT_RATE — uses useState (~3916 tok)
+- `Stage5.jsx` — DEFAULT_RATE (~4387 tok)
 - `Stage5.module.css` — Styles: 30 rules (~872 tok)
-- `Stage6.jsx` — STRATEGY_TAGS — uses useState (~5942 tok)
+- `Stage6.jsx` — STRATEGY_TAGS (~8348 tok)
 - `Stage6.module.css` — Styles: 37 rules (~1323 tok)
-- `Stage7.jsx` — HS_QUIZ_OPTIONS — uses useState (~3680 tok)
+- `Stage7.jsx` — PRE_SEND_CHECKS (~3798 tok)
 - `Stage7.module.css` — Styles: 18 rules (~472 tok)
-- `Stage8.jsx` — ── QC items ────────────────────────────────────────────────────────────────── (~4997 tok)
+- `Stage8.jsx` — buildQcItems (~5557 tok)
 - `Stage89.module.css` — Styles: 66 rules (~2086 tok)
-- `Stage9.jsx` — COMPLAINT_EMAIL — uses useState (~3473 tok)
+- `Stage9.jsx` — Stage9 (~4219 tok)
 - `StageNav.jsx` — STAGES (~540 tok)
 - `StageNav.module.css` — Styles: 14 rules (~745 tok)
 
 ## src/lib/
 
+- `buyerPersona.js` — Build the system prompt that pins the buyer's identity, current emotional state, (~1855 tok)
+- `caseContext.js` — caseContext — the dynamic training-case shape generated by /api/generate-case. (~1124 tok)
 - `dimensionAnalysis.js` — Real-time multi-dimension text analysis functions (~2433 tok)
+- `llm.js` — Stream buyer dialogue from /api/buyer-chat. (~1744 tok)
 - `principles.js` — All PrincipleModal content — keyed by principle ID. (~2233 tok)
 - `quoteCalc.js` — Exports calcQuote (~258 tok)
 - `rules.js` — Normalize text for keyword matching: lowercase + collapse whitespace (~1796 tok)
 - `scoreEngine.js` — Exports SCORE_ACTIONS, applyScore (~525 tok)
-- `StateContext.jsx` — StateContext — uses useReducer, useEffect, useContext (~1412 tok)
+- `scoringRubrics.js` — Rubric definitions for LLM-driven evaluation (Phase 5). (~1206 tok)
+- `stageMaterials.js` — Original hardcoded data, used as fallback. Mirrors v2's hardcoded Stage 2/7/8/9 content. (~2138 tok)
+- `StateContext.jsx` — StateContext (~2140 tok)
 - `storage.js` — Exports loadState, saveState, resetState (~198 tok)
 
 ## src/styles/

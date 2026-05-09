@@ -1,4 +1,813 @@
 {
   "version": 1,
-  "bugs": []
+  "bugs": [
+    {
+      "id": "bug-001",
+      "timestamp": "2026-05-06T13:57:01.772Z",
+      "error_message": "Significant refactor of ",
+      "file": "C:/Users/20443/.claude/plans/soho-breezy-beacon-md-v2-soho-soho-lazy-hippo.md",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 4→18 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-06T13:57:01.772Z"
+    },
+    {
+      "id": "bug-002",
+      "timestamp": "2026-05-06T14:08:09.666Z",
+      "error_message": "Null/undefined access in ",
+      "file": "src/lib/StateContext.jsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-06T14:08:09.666Z"
+    },
+    {
+      "id": "bug-003",
+      "timestamp": "2026-05-06T14:08:19.161Z",
+      "error_message": "Incorrect value in code",
+      "file": "src/lib/storage.js",
+      "root_cause": "Had 'soho-agent-v2-state'",
+      "fix": "Changed to 'soho-agent-v3-state'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-06T14:08:19.161Z"
+    },
+    {
+      "id": "bug-004",
+      "timestamp": "2026-05-06T14:09:37.225Z",
+      "error_message": "Missing error handling in function",
+      "file": "src/features/Stage1.jsx",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-06T14:09:37.225Z"
+    },
+    {
+      "id": "bug-005",
+      "timestamp": "2026-05-06T14:50:59.971Z",
+      "error_message": "Null/undefined access in ",
+      "file": "C:/Users/20443/.claude/plans/soho-breezy-beacon-md-v2-soho-soho-lazy-hippo.md",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-06T14:50:59.971Z"
+    },
+    {
+      "id": "bug-006",
+      "timestamp": "2026-05-06T19:26:02.905Z",
+      "error_message": "Missing error handling in function",
+      "file": "src/lib/llm.js",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-06T19:26:02.905Z"
+    },
+    {
+      "id": "bug-007",
+      "timestamp": "2026-05-06T19:26:47.559Z",
+      "error_message": "CSS fix: type",
+      "file": "src/features/Stage1.jsx",
+      "root_cause": "type: 'SET_CASE_ERROR', error: err.message || String(err) → 'SET_MATERIALS_ERROR', error: err.message || String(err)",
+      "fix": "Changed type: 'SET_CASE_ERROR', error: err.message || String(err) → 'SET_MATERIALS_ERROR', error: err.message || String(err)",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-06T19:26:47.559Z"
+    },
+    {
+      "id": "bug-008",
+      "timestamp": "2026-05-06T19:27:21.730Z",
+      "error_message": "CSS fix: width, height",
+      "file": "src/components/CaseGenerationCard.module.css",
+      "root_cause": "width: 5px → 8px; height: 5px → 8px",
+      "fix": "Changed width: 5px → 8px; height: 5px → 8px",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-06T19:27:21.730Z"
+    },
+    {
+      "id": "bug-009",
+      "timestamp": "2026-05-08T18:53:43.860Z",
+      "error_message": "Null/undefined access in ",
+      "file": "src/data/scenarios.js",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-08T18:53:43.860Z"
+    },
+    {
+      "id": "bug-010",
+      "timestamp": "2026-05-08T18:53:59.036Z",
+      "error_message": "Null/undefined access in ",
+      "file": "src/lib/StateContext.jsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-08T18:53:59.036Z"
+    },
+    {
+      "id": "bug-011",
+      "timestamp": "2026-05-08T18:55:35.422Z",
+      "error_message": "Significant refactor of ",
+      "file": "src/features/Stage7.jsx",
+      "root_cause": "23 lines replaced/restructured",
+      "fix": "Rewrote 33→12 lines (23 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-08T18:55:35.422Z"
+    },
+    {
+      "id": "bug-012",
+      "timestamp": "2026-05-08T18:55:56.049Z",
+      "error_message": "CSS fix: productDesc, spec",
+      "file": "src/features/Stage7.jsx",
+      "root_cause": "productDesc: state.piDraft.productDesc || '不锈钢保温杯 500ml，双层真空，304不锈钢，BPA-free', → state.piDraft.productDesc || materials.piDefaults?.productDesc || '',; spec: state.piDraft.spec || 'Ø70×H220mm, 280g, 304 stainless steel inner & outer', → state.piDraft.spec || materials.piDefaults?.spec || '',",
+      "fix": "Changed productDesc: state.piDraft.productDesc || '不锈钢保温杯 500ml，双层真空，304不锈钢，BPA-free', → state.piDraft.productDesc || materials.piDefaults?.productDesc || '',; spec: state.piDraft.spec || 'Ø70×H220mm, 280g, 304 stainless steel inner & outer', → state.piDraft.spec || materials.piDefaults?.spec || '',",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-08T18:55:56.049Z"
+    },
+    {
+      "id": "bug-013",
+      "timestamp": "2026-05-08T18:56:27.065Z",
+      "error_message": "Null/undefined access in ",
+      "file": "src/features/Stage7.jsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check) | Also: <input value={form.spec} onChange={(e) => set('spec', e.targ",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-05-08T18:56:36.814Z"
+    },
+    {
+      "id": "bug-014",
+      "timestamp": "2026-05-08T18:56:42.118Z",
+      "error_message": "Wrong reference: 7323930000 should be hsCodePlaceholder",
+      "file": "src/features/Stage7.jsx",
+      "root_cause": "Used \"7323930000\" instead of \"hsCodePlaceholder\"",
+      "fix": "Changed 7323930000 → hsCodePlaceholder",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-08T18:56:42.118Z"
+    },
+    {
+      "id": "bug-015",
+      "timestamp": "2026-05-08T18:58:04.505Z",
+      "error_message": "CSS fix: id, title",
+      "file": "src/features/Stage8.jsx",
+      "root_cause": "id: 'port', label: '目的港', value: 'Hamburg, Germany', hasError: false → `bl_${i; title: '🌡️ 保温性能抽测', → `🔍 ${item.label",
+      "fix": "Changed id: 'port', label: '目的港', value: 'Hamburg, Germany', hasError: false → `bl_${i; title: '🌡️ 保温性能抽测', → `🔍 ${item.label",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-08T18:58:04.505Z"
+    },
+    {
+      "id": "bug-016",
+      "timestamp": "2026-05-08T18:58:13.495Z",
+      "error_message": "Null/undefined access in ",
+      "file": "src/features/Stage8.jsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check) | Also: const rawNotifyDims = analyzeShipmentNotification(notifyText; const rubricDims = materials.shipmentNotifyRubric?.dimension",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-05-08T18:58:41.122Z"
+    },
+    {
+      "id": "bug-017",
+      "timestamp": "2026-05-08T18:58:32.849Z",
+      "error_message": "Wrong condition in logic",
+      "file": "src/features/Stage8.jsx",
+      "root_cause": "Condition was: if (missedErrors.includes('hscode')",
+      "fix": "Changed to: if (blMismatchId && missedErrors.includes(blMismatchId)",
+      "tags": [
+        "auto-detected",
+        "logic-fix",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-08T18:58:32.849Z"
+    },
+    {
+      "id": "bug-018",
+      "timestamp": "2026-05-08T18:59:37.802Z",
+      "error_message": "Significant refactor of ",
+      "file": "src/features/Stage9.jsx",
+      "root_cause": "8 lines replaced/restructured",
+      "fix": "Rewrote 21→11 lines (8 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-08T18:59:37.802Z"
+    },
+    {
+      "id": "bug-019",
+      "timestamp": "2026-05-08T19:00:13.051Z",
+      "error_message": "CSS fix: 8",
+      "file": "src/features/Stage9.jsx",
+      "root_cause": "8: if user accepted the logo tolerance, factory has leverage → if user accepted the FIRST QC item's borderline tolerance, factory has leverage",
+      "fix": "Changed 8: if user accepted the logo tolerance, factory has leverage → if user accepted the FIRST QC item's borderline tolerance, factory has leverage",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-08T19:00:13.051Z"
+    },
+    {
+      "id": "bug-020",
+      "timestamp": "2026-05-08T19:00:48.729Z",
+      "error_message": "Null/undefined access in ",
+      "file": "src/features/Stage9.jsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check) | Also: {buyerFirstName} 发来了 5 张照片，确认了你产品的{complaintIssueType}问题。请选择; 问题：{complaintSampleData}，{complaintIssueType}。<br />",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-05-08T19:01:03.577Z"
+    },
+    {
+      "id": "bug-021",
+      "timestamp": "2026-05-08T19:01:14.204Z",
+      "error_message": "Incorrect value in code",
+      "file": "src/features/Stage9.jsx",
+      "root_cause": "Had `Dear Michael,\\n\\nI hope the replacement units arr",
+      "fix": "Changed to `Dear ${buyerFirstName},\\n\\nI hope the replacement",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-08T19:01:14.204Z"
+    },
+    {
+      "id": "bug-022",
+      "timestamp": "2026-05-08T19:02:13.516Z",
+      "error_message": "CSS fix: factoryPrice",
+      "file": "src/features/Stage5.jsx",
+      "root_cause": "factoryPrice: initial.factoryPrice || (supplier?.factoryPrice ?? 0), → initial.factoryPrice || defaultFactoryPrice,",
+      "fix": "Changed factoryPrice: initial.factoryPrice || (supplier?.factoryPrice ?? 0), → initial.factoryPrice || defaultFactoryPrice,",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-08T19:02:13.516Z"
+    },
+    {
+      "id": "bug-023",
+      "timestamp": "2026-05-08T19:03:35.656Z",
+      "error_message": "Null/undefined access in ",
+      "file": "src/features/Stage34.jsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-08T19:03:35.656Z"
+    },
+    {
+      "id": "bug-024",
+      "timestamp": "2026-05-08T19:03:51.582Z",
+      "error_message": "Significant refactor of ",
+      "file": "src/features/Stage34.jsx",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 4→7 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-08T19:03:51.582Z"
+    },
+    {
+      "id": "bug-025",
+      "timestamp": "2026-05-08T20:18:33.317Z",
+      "error_message": "Null/undefined access in ",
+      "file": "src/features/Stage34.jsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-08T20:18:33.317Z"
+    },
+    {
+      "id": "bug-026",
+      "timestamp": "2026-05-08T20:19:08.434Z",
+      "error_message": "Null/undefined access in ",
+      "file": "src/features/Stage5.jsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-08T20:19:08.434Z"
+    },
+    {
+      "id": "bug-027",
+      "timestamp": "2026-05-08T20:19:18.381Z",
+      "error_message": "Null/undefined access in ",
+      "file": "src/features/Stage8.jsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-08T20:19:18.381Z"
+    },
+    {
+      "id": "bug-028",
+      "timestamp": "2026-05-08T20:19:33.647Z",
+      "error_message": "Null/undefined access in ",
+      "file": "src/features/Stage9.jsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-08T20:19:33.647Z"
+    },
+    {
+      "id": "bug-029",
+      "timestamp": "2026-05-08T20:21:22.149Z",
+      "error_message": "CSS fix: display",
+      "file": "src/features/Stage1.jsx",
+      "root_cause": "display: 'grid', gridTemplateColumns: '1fr 220px', gap: 12, alignItems: 'flex-start' → 'grid', gridTemplateColumns: '1fr 260px', gap: 12, alignItems: 'flex-start'",
+      "fix": "Changed display: 'grid', gridTemplateColumns: '1fr 220px', gap: 12, alignItems: 'flex-start' → 'grid', gridTemplateColumns: '1fr 260px', gap: 12, alignItems: 'flex-start'",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-08T20:21:22.149Z"
+    },
+    {
+      "id": "bug-030",
+      "timestamp": "2026-05-08T20:24:20.167Z",
+      "error_message": "Missing guard clause",
+      "file": "api/buyer-chat.js",
+      "root_cause": "No early return/throw for edge case: upstream.status >= 500 && upstream.status < 600 && attempt <",
+      "fix": "Added guard clause: if (upstream.status >= 500 && upstream.statu)",
+      "tags": [
+        "auto-detected",
+        "guard-clause",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-08T20:24:20.167Z"
+    },
+    {
+      "id": "bug-031",
+      "timestamp": "2026-05-09T08:57:51.406Z",
+      "error_message": "Wrong reference: 400 should be 300",
+      "file": "api/buyer-chat.js",
+      "root_cause": "Used \"400\" instead of \"300\"",
+      "fix": "Changed 400 → 300",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-09T08:57:51.407Z"
+    },
+    {
+      "id": "bug-032",
+      "timestamp": "2026-05-09T08:57:54.638Z",
+      "error_message": "Wrong reference: 600 should be 400",
+      "file": "api/score-text.js",
+      "root_cause": "Used \"600\" instead of \"400\"",
+      "fix": "Changed 600 → 400",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-09T08:57:54.638Z"
+    },
+    {
+      "id": "bug-033",
+      "timestamp": "2026-05-09T08:57:58.916Z",
+      "error_message": "Wrong reference: 3500 should be 2800",
+      "file": "api/generate-stage-materials.js",
+      "root_cause": "Used \"3500\" instead of \"2800\"",
+      "fix": "Changed 3500 → 2800",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-09T08:57:58.916Z"
+    },
+    {
+      "id": "bug-034",
+      "timestamp": "2026-05-09T08:59:31.350Z",
+      "error_message": "Significant refactor of ",
+      "file": "src/components/LLMScorePanel.jsx",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 17→25 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-09T08:59:31.350Z"
+    },
+    {
+      "id": "bug-035",
+      "timestamp": "2026-05-09T09:07:52.461Z",
+      "error_message": "Missing guard clause",
+      "file": "api/generate-case.js",
+      "root_cause": "No early return/throw for edge case: !entry",
+      "fix": "Added guard clause: if (!entry)",
+      "tags": [
+        "auto-detected",
+        "guard-clause",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-05-09T09:07:58.693Z"
+    },
+    {
+      "id": "bug-036",
+      "timestamp": "2026-05-09T09:08:03.804Z",
+      "error_message": "Wrong return value",
+      "file": "api/generate-case.js",
+      "root_cause": "Was returning: json(parsed, 200);",
+      "fix": "Now returns: json(result, 200);",
+      "tags": [
+        "auto-detected",
+        "return-value",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-09T09:08:03.804Z"
+    },
+    {
+      "id": "bug-037",
+      "timestamp": "2026-05-09T09:08:18.922Z",
+      "error_message": "Wrong return value",
+      "file": "api/generate-stage-materials.js",
+      "root_cause": "Was returning: json(parsed, 200);",
+      "fix": "Now returns: json({",
+      "tags": [
+        "auto-detected",
+        "return-value",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-09T09:08:18.922Z"
+    },
+    {
+      "id": "bug-038",
+      "timestamp": "2026-05-09T09:08:22.590Z",
+      "error_message": "Wrong return value",
+      "file": "api/score-text.js",
+      "root_cause": "Was returning: json(sanitized, 200);",
+      "fix": "Now returns: json({",
+      "tags": [
+        "auto-detected",
+        "return-value",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-09T09:08:22.590Z"
+    },
+    {
+      "id": "bug-039",
+      "timestamp": "2026-05-09T09:08:59.873Z",
+      "error_message": "Wrong return value",
+      "file": "src/lib/llm.js",
+      "root_cause": "Was returning: full;",
+      "fix": "Now returns: full; }",
+      "tags": [
+        "auto-detected",
+        "return-value",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-09T09:08:59.873Z"
+    },
+    {
+      "id": "bug-040",
+      "timestamp": "2026-05-09T09:09:47.446Z",
+      "error_message": "Null/undefined access in ",
+      "file": "src/lib/StateContext.jsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check) | Also: export function useTrackTokens() {; const dispatch = useAppDispatch();",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-05-09T09:09:51.812Z"
+    },
+    {
+      "id": "bug-041",
+      "timestamp": "2026-05-09T09:11:04.419Z",
+      "error_message": "CSS fix: maxTokens",
+      "file": "src/features/Stage6.jsx",
+      "root_cause": "maxTokens: 380, → 300,",
+      "fix": "Changed maxTokens: 380, → 300,",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-09T09:11:04.419Z"
+    },
+    {
+      "id": "bug-042",
+      "timestamp": "2026-05-09T09:11:33.294Z",
+      "error_message": "Wrong reference: state should be tokenUsage",
+      "file": "src/features/RightPanel.jsx",
+      "root_cause": "Used \"state\" instead of \"tokenUsage\"",
+      "fix": "Changed state → tokenUsage",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-09T09:11:33.294Z"
+    },
+    {
+      "id": "bug-043",
+      "timestamp": "2026-05-09T09:11:44.676Z",
+      "error_message": "Null/undefined access in ",
+      "file": "src/features/RightPanel.jsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-09T09:11:44.676Z"
+    },
+    {
+      "id": "bug-101",
+      "timestamp": "2026-05-09T09:31:47.980Z",
+      "error_message": "generate-case.js cache hits returned _usage field causing false token counts",
+      "file": "api/generate-case.js",
+      "root_cause": "cacheSet stored result including _usage; cache hits returned it directly",
+      "fix": "Store only parsed data in cache; return _usage only on real LLM calls",
+      "tags": [
+        "cache",
+        "token-counting"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-09T09:31:47.980Z"
+    },
+    {
+      "id": "bug-102",
+      "timestamp": "2026-05-09T09:31:47.980Z",
+      "error_message": "No CORS headers on API routes",
+      "file": "api/*.js",
+      "root_cause": "Handlers returned Response with no CORS headers",
+      "fix": "Created api/_shared.js with CORS helpers; all routes updated",
+      "tags": [
+        "cors",
+        "security"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-09T09:31:47.980Z"
+    },
+    {
+      "id": "bug-103",
+      "timestamp": "2026-05-09T09:31:47.980Z",
+      "error_message": "buyer-chat accepted systemPrompt from client body — prompt injection",
+      "file": "api/buyer-chat.js",
+      "root_cause": "Client built and sent full system prompt; attacker could inject any persona",
+      "fix": "Server now builds systemPrompt from {caseContext,buyerProfile,stageContext}",
+      "tags": [
+        "security",
+        "prompt-injection"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-09T09:31:47.980Z"
+    },
+    {
+      "id": "bug-104",
+      "timestamp": "2026-05-09T09:31:47.980Z",
+      "error_message": "Stage6: no AbortController — stream continued after unmount",
+      "file": "src/features/Stage6.jsx",
+      "root_cause": "streamBuyerChat called with no abort signal",
+      "fix": "Added abortRef per-call; useEffect cleanup aborts on unmount; AbortError silenced",
+      "tags": [
+        "resource-leak",
+        "abort"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-09T09:31:47.980Z"
+    },
+    {
+      "id": "bug-105",
+      "timestamp": "2026-05-09T09:31:47.980Z",
+      "error_message": "LLMScorePanel: setInterval not cleared on unmount",
+      "file": "src/components/LLMScorePanel.jsx",
+      "root_cause": "No useEffect cleanup for cooldown interval",
+      "fix": "Added useEffect cleanup clearInterval(cooldownTimerRef.current)",
+      "tags": [
+        "memory-leak",
+        "react"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-09T09:31:47.980Z"
+    },
+    {
+      "id": "bug-106",
+      "timestamp": "2026-05-09T09:31:47.980Z",
+      "error_message": "vite.config.js handler cache never invalidated — hot reload broken",
+      "file": "vite.config.js",
+      "root_cause": "handlerCache returned stale module on file changes",
+      "fix": "Removed cache entirely; always re-import with ?t=Date.now()",
+      "tags": [
+        "dev-dx",
+        "hot-reload"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-09T09:31:47.980Z"
+    },
+    {
+      "id": "bug-107",
+      "timestamp": "2026-05-09T09:31:47.980Z",
+      "error_message": "generate-stage-materials: AbortSignal.timeout(60000) exceeds Edge Function limit",
+      "file": "api/generate-stage-materials.js",
+      "root_cause": "Edge Functions time out before 60s fires on Hobby plan",
+      "fix": "Reduced to 45_000ms",
+      "tags": [
+        "timeout",
+        "vercel-edge"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-09T09:31:47.980Z"
+    },
+    {
+      "id": "bug-108",
+      "timestamp": "2026-05-09T09:31:47.980Z",
+      "error_message": "pingLLM used OPTIONS — always resolved true regardless of API state",
+      "file": "src/lib/llm.js",
+      "root_cause": "OPTIONS returns 405 which is < 500; ping falsely reported success",
+      "fix": "Changed to POST with {_ping:true}; 400 = server up, 5xx = broken",
+      "tags": [
+        "ping",
+        "api-health"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-09T09:31:47.980Z"
+    }
+  ]
 }

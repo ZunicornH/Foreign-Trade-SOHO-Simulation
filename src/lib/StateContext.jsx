@@ -24,6 +24,18 @@ function reducer(state, action) {
     case 'SET_TRAINING_CASE':
       return { ...state, trainingCase: { ...state.trainingCase, ...action.payload } };
     case 'SET_SUPPLIER':
+      // Updates whichever supplier list is active: prefer materials, fall back to legacy state.suppliers.
+      if (state.stageMaterials?.suppliers) {
+        return {
+          ...state,
+          stageMaterials: {
+            ...state.stageMaterials,
+            suppliers: state.stageMaterials.suppliers.map((s) =>
+              s.id === action.id ? { ...s, ...action.payload } : s
+            ),
+          },
+        };
+      }
       return {
         ...state,
         suppliers: state.suppliers.map((s) =>
@@ -119,6 +131,63 @@ function reducer(state, action) {
     case 'SET_STAGE9':
       return { ...state, stage9: { ...state.stage9, ...action.payload } };
 
+    // v3: Dynamic case context
+    case 'SET_CASE_GENERATING':
+      return { ...state, caseGenerating: action.value, caseError: action.value ? null : state.caseError };
+    case 'SET_CASE_CONTEXT':
+      return { ...state, caseContext: action.payload, caseGenerating: false, caseError: null };
+    case 'SET_CASE_ERROR':
+      return { ...state, caseGenerating: false, caseError: action.error };
+
+    // v3.1: Stage materials
+    case 'SET_MATERIALS_GENERATING':
+      return { ...state, materialsGenerating: action.value, materialsError: action.value ? null : state.materialsError };
+    case 'SET_STAGE_MATERIALS':
+      return { ...state, stageMaterials: action.payload, materialsGenerating: false, materialsError: null };
+    case 'SET_MATERIALS_ERROR':
+      return { ...state, materialsGenerating: false, materialsError: action.error };
+
+    // v3: Buyer profile updates
+    case 'UPDATE_BUYER_PROFILE':
+      return { ...state, buyerProfile: { ...state.buyerProfile, ...action.payload } };
+    case 'APPEND_BUYER_MEMORY':
+      return {
+        ...state,
+        buyerProfile: {
+          ...state.buyerProfile,
+          memory: [...(state.buyerProfile?.memory || []), action.fact],
+        },
+      };
+
+    // v3: AI messages cache
+    case 'SET_AI_MESSAGE':
+      return {
+        ...state,
+        aiMessages: {
+          ...state.aiMessages,
+          [action.stage]: {
+            ...(state.aiMessages?.[action.stage] || {}),
+            [action.key]: action.value,
+          },
+        },
+      };
+
+    // v3: AI scores
+    case 'SET_AI_SCORE':
+      return {
+        ...state,
+        aiScores: { ...state.aiScores, [action.fieldKey]: action.payload },
+      };
+
+    case 'ADD_TOKEN_USAGE':
+      return {
+        ...state,
+        tokenUsage: {
+          input: (state.tokenUsage?.input ?? 0) + (action.input || 0),
+          output: (state.tokenUsage?.output ?? 0) + (action.output || 0),
+        },
+      };
+
     case 'RESET':
       return action.state;
     default:
@@ -148,4 +217,9 @@ export function useAppState() {
 
 export function useAppDispatch() {
   return useContext(DispatchContext);
+}
+
+export function useTrackTokens() {
+  const dispatch = useAppDispatch();
+  return (usage) => dispatch({ type: 'ADD_TOKEN_USAGE', input: usage?.input || 0, output: usage?.output || 0 });
 }

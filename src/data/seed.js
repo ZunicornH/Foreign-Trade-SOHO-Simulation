@@ -1,5 +1,5 @@
 export const SEED_STATE = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   currentStage: 1,
   stage34Step: 'prospecting',
   trainingCase: {
@@ -124,6 +124,36 @@ export const SEED_STATE = {
   },
   // v2: ContextBriefing acknowledgments (stage → done)
   briefingsDone: {},
+
+  // v3: Dynamic case context (LLM-generated based on product+market+usp)
+  // null = not generated yet → use FALLBACK_CASE; populated = LLM result
+  caseContext: null,
+  caseGenerating: false,
+  caseError: null,
+
+  // v3.1: Dynamic stage materials (suppliers, HS quiz, QC items, etc.)
+  // Generated in background after caseContext resolves.
+  stageMaterials: null,
+  materialsGenerating: false,
+  materialsError: null,
+
+  // v3: Buyer dynamic profile (mood/trust/memory across stages)
+  buyerProfile: {
+    mood: 'neutral',     // neutral | softening | hardening | excited | disappointed
+    trust: 50,           // 0-100
+    patience: 100,       // 0-100
+    memory: [],          // [{ stage, fact }]
+  },
+
+  // v3: LLM-generated messages per stage, e.g. { 4: { inquiry: '...' }, 6: [{role,content}], 9: { complaint: '...' } }
+  aiMessages: {},
+
+  // v3: LLM-scored evaluations per field key
+  // e.g. { prospecting_email: { dim_key: { score, hint }, ... }, repurchase_email: {...} }
+  aiScores: {},
+
+  // v3: accumulated LLM token usage for this training session
+  tokenUsage: { input: 0, output: 0 },
 };
 
 export const BUYER_SCRIPTS = [

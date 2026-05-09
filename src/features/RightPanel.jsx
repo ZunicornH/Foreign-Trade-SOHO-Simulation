@@ -14,7 +14,7 @@ function ScoreItem({ item }) {
 
 export default function RightPanel() {
   const state = useAppState();
-  const { trainingCase, suppliers, selectedSupplier, scoreCard, riskFlags } = state;
+  const { trainingCase, suppliers, selectedSupplier, scoreCard, riskFlags, tokenUsage } = state;
   const supplier = suppliers.find((s) => s.id === selectedSupplier);
   const cur = state.currentStage;
 
@@ -151,6 +151,17 @@ export default function RightPanel() {
             <div className={styles.kvRow}><span className={styles.kvLabel}>名称</span><span className={styles.kvValue} style={{fontSize:12}}>{supplier.name}</span></div>
             <div className={styles.kvRow}><span className={styles.kvLabel}>出厂价</span><span className={styles.kvValue}>¥{supplier.factoryPrice}/个</span></div>
             <div className={styles.kvRow}><span className={styles.kvLabel}>MOQ</span><span className={styles.kvValue}>{supplier.moq} 个</span></div>
+          </div>
+        </div>
+      )}
+
+      {/* Token usage */}
+      {((tokenUsage?.input ?? 0) + (tokenUsage?.output ?? 0)) > 0 && (
+        <div className={styles.section} style={{ borderTop: '1px dashed var(--color-border)', paddingTop: 10 }}>
+          <div className={styles.sectionTitle} style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>本次 AI 用量</div>
+          <div style={{ fontSize: 11, color: 'var(--color-text-muted)', lineHeight: 1.8 }}>
+            <div>输入 {((tokenUsage?.input ?? 0) / 1000).toFixed(1)}k · 输出 {((tokenUsage?.output ?? 0) / 1000).toFixed(1)}k tokens</div>
+            <div>≈ ¥{(((tokenUsage?.input ?? 0) + (tokenUsage?.output ?? 0) * 3) / 1_000_000).toFixed(4)}</div>
           </div>
         </div>
       )}

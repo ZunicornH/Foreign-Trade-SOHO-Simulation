@@ -1,53 +1,90 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import styles from './Stage89.module.css';
 import Button from '../components/Button.jsx';
 import AlertBox from '../components/AlertBox.jsx';
 import ContextBriefing from '../components/ContextBriefing.jsx';
 import DimensionFeedback from '../components/DimensionFeedback.jsx';
+import LLMScorePanel from '../components/LLMScorePanel.jsx';
 import { useAppState, useAppDispatch } from '../lib/StateContext.jsx';
 import { PRINCIPLES } from '../lib/principles.js';
-import { SCENARIOS } from '../data/scenarios.js';
+import { SCENARIOS, buildQcRejectScenario } from '../data/scenarios.js';
 import { analyzeShipmentNotification } from '../lib/dimensionAnalysis.js';
+import { getActiveMaterials } from '../lib/stageMaterials.js';
+import { getActiveCase } from '../lib/caseContext.js';
+import { getRubric } from '../lib/scoringRubrics.js';
 
-// ── QC items ──────────────────────────────────────────────────────────────────
-const QC_ITEMS = [
-  {
-    id: 'logo',
-    title: '🔍 Logo 位置检验',
-    report: '工厂验货报告显示：500 个产品中抽检 25 个，Logo 丝印位置偏左约 3mm。工厂表示这在行业标准公差范围内（±5mm），要求放行。',
-    acceptLabel: '接受，公差在合理范围内，主动告知买家',
-    rejectLabel: '拒绝，要求工厂重新校准并返工',
-  },
-  {
-    id: 'lfgb_label',
-    title: '✅ LFGB 标签核查',
-    report: '抽检结果：LFGB 标志清晰，批次号 LOT-2024-0512 可追溯，认证有效期 2027 年 6 月。外包装标注符合德国市场要求。',
-    acceptLabel: '通过，标签合规',
-    rejectLabel: '标记为异常，要求进一步核查',
-  },
-  {
-    id: 'thermal',
-    title: '🌡️ 保温性能抽测',
-    report: '随机抽测 5 只，注入 95°C 热水，12 小时后测温结果：52°C / 51°C / 53°C / 49°C / 52°C。所有样品均高于最低标准 50°C。',
-    acceptLabel: '通过，保温性能达标',
-    rejectLabel: '标记异常，要求全批次复测',
-  },
-];
+// Build UI-shaped QC items from materials.qcChecklist.
+// First item is treated as the "borderline" case (factory claims tolerance).
+function buildQcItems(qcChecklist) {
+  if (!Array.isArray(qcChecklist) || qcChecklist.length === 0) return [];
+  return qcChecklist.map((item, i) => {
+    const isBorderline = i === 0;
+    const report = isBorderline
+      ? `工厂验货报告：${item.description || item.label}。工厂表示「${item.factoryToleranceClaim}」，要求放行。`
+      : `${item.description || item.label}。抽检结果：本批次性能符合规格要求。`;
+    const acceptLabel = isBorderline
+      ? '接受，公差在合理范围内，主动告知买家'
+      : `通过，${item.label} 合格`;
+    const rejectLabel = isBorderline
+      ? '拒绝，要求工厂重新校准并返工'
+      : '标记异常，要求复测 / 复检';
+    return {
+      id: item.id || `qc_${i + 1}`,
+      title: `🔍 ${item.label}`,
+      report,
+      acceptLabel,
+      rejectLabel,
+      isBorderline,
+    };
+  });
+}
 
-// ── B/L items ─────────────────────────────────────────────────────────────────
-const BL_FIELDS = [
-  { id: 'shipper', label: '发货人（Shipper）', value: '深圳优杯科技有限公司 / Shenzhen YouCup Technology Co., Ltd.', hasError: false },
-  { id: 'consignee', label: '收货人（Consignee）', value: 'Braun Kitchenwere GmbH, Hamburg, Germany', hasError: true, errorNote: '拼写错误：Kitchenwere → 应为 Kitchenware' },
-  { id: 'description', label: '货物描述', value: 'Stainless Steel Vacuum Flask 500ml, QTY: 500 PCS', hasError: false },
-  { id: 'hscode', label: 'HS 编码', value: '3924.90.0000 (Plastic Household Articles)', hasError: true, errorNote: 'HS 编码错误：保温杯应为 7323.93，而非 3924（塑料家用品）' },
-  { id: 'port', label: '目的港', value: 'Hamburg, Germany', hasError: false },
-];
+// Build UI-shaped B/L fields from materials.blFields.
+function buildBlFields(blFields) {
+  if (!Array.isArray(blFields) || blFields.length === 0) return [];
+  return blFields.map((f, i) => {
+    let errorNote = '';
+    if (f.isError) {
+      switch (f.errorType) {
+        case 'spelling':
+          errorNote = `拼写错误：${f.value} 中有错别字`;
+          break;
+        case 'mismatch':
+          errorNote = `${f.label} 与 PI 不符，需要订正`;
+          break;
+        default:
+          errorNote = `${f.label} 存在错误`;
+      }
+    }
+    return {
+      id: `bl_${i}`,
+      label: f.label,
+      value: f.value,
+      hasError: !!f.isError,
+      errorType: f.errorType || null,
+      errorNote,
+    };
+  });
+}
 
 export default function Stage8() {
   const state = useAppState();
   const dispatch = useAppDispatch();
   const s8 = state.stage8 || {};
   const subStep = s8.subStep || 'qc';
+
+  const materials = getActiveMaterials(state);
+  const caseCtx = getActiveCase(state);
+  const buyerName = caseCtx?.buyerPersona?.name || 'the buyer';
+
+  // Derive QC + B/L from materials (with fallback)
+  const QC_ITEMS = useMemo(() => buildQcItems(materials.qcChecklist), [materials]);
+  const BL_FIELDS = useMemo(() => buildBlFields(materials.blFields), [materials]);
+  const firstQcItem = materials.qcChecklist?.[0];
+  const qcRejectScenario = useMemo(() => buildQcRejectScenario(firstQcItem), [firstQcItem]);
+  const firstQcId = QC_ITEMS[0]?.id;
+  // Find the mismatch B/L row's id (for missed-error principle trigger)
+  const blMismatchId = BL_FIELDS.find((f) => f.errorType === 'mismatch')?.id;
 
   // QC state
   const [qcDecisions, setQcDecisions] = useState(s8.qcDecisions || {});
@@ -83,14 +120,25 @@ export default function Stage8() {
     setQcDecisions(next);
     dispatch({ type: 'SET_STAGE8', payload: { qcDecisions: next } });
 
-    if (id === 'logo' && decision === 'reject' && !qcScenarioShown) {
+    if (id === firstQcId && decision === 'reject' && !qcScenarioShown) {
       setQcScenarioShown(true);
     }
+
+    // Persist QC decision to buyer memory so Stage 9's buyer LLM (and any future)
+    // knows whether the user accepted or rejected the borderline tolerance.
+    const qcLabel = QC_ITEMS.find((q) => q.id === id)?.title?.replace(/^[^\s]+\s*/, '') || id;
+    dispatch({
+      type: 'APPEND_BUYER_MEMORY',
+      fact: {
+        stage: 8,
+        fact: `User ${decision === 'accept' ? 'ACCEPTED' : 'REJECTED'} QC item "${qcLabel}".`,
+        ts: Date.now(),
+      },
+    });
   }
 
   function handleQcScenarioChoice(choiceIdx) {
-    const scenario = SCENARIOS.SCENARIO_QC_REJECT_MINOR;
-    const opt = scenario.options[choiceIdx];
+    const opt = qcRejectScenario.options[choiceIdx];
     dispatch({ type: 'SET_SCENARIO_RESULT', scenarioId: 'SCENARIO_QC_REJECT_MINOR', choice: choiceIdx, outcome: opt.outcome });
     if (opt.principleId && PRINCIPLES[opt.principleId]) {
       dispatch({ type: 'SHOW_PRINCIPLE_MODAL', modal: PRINCIPLES[opt.principleId] });
@@ -117,9 +165,9 @@ export default function Stage8() {
     const missedErrors = correctErrors.filter((id) => !blMarked.includes(id));
     const falsePositives = blMarked.filter((id) => !correctErrors.includes(id));
 
-    if (missedErrors.includes('hscode')) {
+    if (blMismatchId && missedErrors.includes(blMismatchId)) {
       dispatch({ type: 'SHOW_PRINCIPLE_MODAL', modal: PRINCIPLES.PRINCIPLE_BL_MISMATCH });
-      setBlWarning('你漏掉了 HS 编码错误（最严重的那个），请重新核对每一行。');
+      setBlWarning('你漏掉了 HS 编码 / 单据不一致错误（最严重的那一条），请重新核对每一行。');
       return;
     }
 
@@ -137,7 +185,13 @@ export default function Stage8() {
   }
 
   // ── Shipment notification ─────────────────────────────────────────────────────
-  const notifyDims = analyzeShipmentNotification(notifyText);
+  const rawNotifyDims = analyzeShipmentNotification(notifyText);
+  const rubricDims = materials.shipmentNotifyRubric?.dimensions || [];
+  // Override labels with case-specific rubric labels when available
+  const notifyDims = rawNotifyDims.map((d, i) => ({
+    ...d,
+    label: rubricDims[i]?.label || d.label,
+  }));
   const notifyScore = notifyDims.filter((d) => d.score === 1).length;
 
   function handleSendNotify() {
@@ -238,14 +292,14 @@ export default function Stage8() {
               </div>
             ))}
 
-            {/* Logo reject scenario */}
+            {/* Borderline-QC reject scenario (dynamic per case) */}
             {qcScenarioShown && !qcScenarioDone && (
               <div className={styles.scenario}>
-                <div className={styles.scenarioTitle}>⚡ {SCENARIOS.SCENARIO_QC_REJECT_MINOR.title}</div>
-                <div className={styles.scenarioBody}>{SCENARIOS.SCENARIO_QC_REJECT_MINOR.body}</div>
-                <div className={styles.scenarioQuestion}>{SCENARIOS.SCENARIO_QC_REJECT_MINOR.question}</div>
+                <div className={styles.scenarioTitle}>⚡ {qcRejectScenario.title}</div>
+                <div className={styles.scenarioBody}>{qcRejectScenario.body}</div>
+                <div className={styles.scenarioQuestion}>{qcRejectScenario.question}</div>
                 <div className={styles.scenarioOptions}>
-                  {SCENARIOS.SCENARIO_QC_REJECT_MINOR.options.map((opt, i) => (
+                  {qcRejectScenario.options.map((opt, i) => (
                     <button key={i} className={styles.scenarioOpt} onClick={() => handleQcScenarioChoice(i)}>
                       {String.fromCharCode(65 + i)}. {opt.label}
                     </button>
@@ -257,7 +311,7 @@ export default function Stage8() {
             {qcScenarioDone && state.scenarioResults?.SCENARIO_QC_REJECT_MINOR && (
               <AlertBox
                 level={state.scenarioResults.SCENARIO_QC_REJECT_MINOR.outcome === 'GOOD' ? 'success' : 'warn'}
-                msg={SCENARIOS.SCENARIO_QC_REJECT_MINOR.options[state.scenarioResults.SCENARIO_QC_REJECT_MINOR.choice]?.explanation}
+                msg={qcRejectScenario.options[state.scenarioResults.SCENARIO_QC_REJECT_MINOR.choice]?.explanation}
               />
             )}
 
@@ -318,7 +372,7 @@ export default function Stage8() {
           <div className={styles.section}>
             <div className={styles.sectionTitle}>8c. 出运通知邮件</div>
             <div className={styles.sectionDesc}>
-              货物已出运，请给 Michael 写出运通知邮件。要包含 4 个关键要素（右侧实时分析）。
+              货物已出运，请给 {buyerName} 写出运通知邮件。要包含 4 个关键要素（右侧实时分析）。
             </div>
 
             <div className={styles.notifyLayout}>
@@ -326,11 +380,17 @@ export default function Stage8() {
                 className={styles.notifyArea}
                 value={notifyText}
                 onChange={(e) => setNotifyText(e.target.value)}
-                placeholder={`Dear Michael,\n\nYour order has been shipped. Here are the details:\n\nTracking / B/L No: [编号]\nBalance due: USD [金额]\nPlease transfer by [具体日期]\n\nBank details: [PI 上的收款账户]\n\nBest regards,\n[Your Name]`}
+                placeholder={`Dear ${buyerName.split(' ')[0]},\n\nYour order has been shipped. Here are the details:\n\nTracking / B/L No: [编号]\nBalance due: USD [金额]\nPlease transfer by [具体日期]\n\nBank details: [PI 上的收款账户]\n\nBest regards,\n[Your Name]`}
                 rows={10}
                 disabled={notifySent}
               />
-              <DimensionFeedback dimensions={notifyDims} />
+              <LLMScorePanel
+                text={notifyText}
+                rubric={getRubric('shipment_notification', state)}
+                fallbackDims={notifyDims}
+                cacheKey={state.caseContext ? 'with-case' : 'no-case'}
+                minLength={40}
+              />
             </div>
 
             {notifyScore < 3 && notifyText.trim() && (

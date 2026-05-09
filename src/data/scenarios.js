@@ -1,4 +1,87 @@
 // Scenario definitions for ScenarioInjector
+// Static SCENARIOS export = legacy / fallback values (kitchenware / Germany).
+// Builder functions (buildCertRiskScenario, buildQcRejectScenario) generate
+// case-specific versions using caseContext + stageMaterials.
+
+/**
+ * Build a Stage 2 cert-risk scenario tailored to the current case.
+ * Falls back to LFGB / kitchenware text when caseContext or materials are missing.
+ */
+export function buildCertRiskScenario(caseContext, materials) {
+  const persona = caseContext?.buyerPersona;
+  const market = persona?.country || caseContext?.targetMarket || '德国市场';
+  const mandatoryCert =
+    caseContext?.requiredCerts?.find((c) => c.mandatory) || { name: 'LFGB' };
+  const supA = materials?.suppliers?.[0];
+  const supB = materials?.suppliers?.[1];
+  const supAName = supA?.name || '义乌恒温制品厂';
+  const supBName = supB?.name || '深圳优杯科技';
+  const priceA = supA?.factoryPriceCNY ?? 28;
+  const priceB = supB?.factoryPriceCNY ?? 32;
+  const priceDelta = Math.max(1, priceB - priceA);
+  const moqA = supA?.moq || 500;
+  const supBHasInHouseQC = supB?.qcCapability === 'in-house';
+
+  return {
+    id: 'SCENARIO_CERT_RISK',
+    title: `突发情况：${supAName} 不支持 ${mandatoryCert.name} 认证`,
+    body: `${supAName} 回复：他们之前没出口过${market}，${mandatoryCert.name} 认证需要你自行委托第三方检测机构（如 SGS / BV），费用约 ¥8,000–12,000，检测周期 3–4 周，且需要工厂配合提供样品和材质报告。`,
+    question: '你会怎么处理？',
+    options: [
+      {
+        label: `换 ${supBName} —— 他们支持 ${mandatoryCert.name}，虽然贵 ¥${priceDelta}/个`,
+        outcome: 'GOOD',
+        explanation: `正确选择。认证支持是隐性成本，¥${priceDelta}/个的价差（${moqA} 件 = ¥${priceDelta * moqA}）远小于自行认证的费用和时间成本。${supBHasInHouseQC ? `而且 ${supBName} 的自有 QC 在阶段 8 验货时也更有保障。` : ''}`,
+      },
+      {
+        label: `继续用 ${supAName}，自己出认证费并摊入报价（每件加 ¥16–24）`,
+        outcome: 'OK',
+        explanation: `可以接受，但要注意：3–4 周认证周期会延长交期，需要提前告知买家。${mandatoryCert.name} 认证费按 ${moqA} 件摊算约 ¥16–24/件，必须加进报价，否则从利润里扣。`,
+      },
+      {
+        label: `跳过 ${mandatoryCert.name} 认证，先发货试试看，${market}海关不一定会查`,
+        outcome: 'BAD',
+        principleId: 'PRINCIPLE_CERT_SKIP',
+        explanation: '高风险操作，会触发原理说明。',
+      },
+    ],
+  };
+}
+
+/**
+ * Build a Stage 8 QC reject scenario tailored to the actual first QC item.
+ * Falls back to "Logo 公差" content when materials are missing.
+ */
+export function buildQcRejectScenario(qcItem) {
+  const item =
+    qcItem || {
+      label: 'Logo 公差',
+      factoryToleranceClaim: '3mm 偏移在行业可接受范围（±5mm）',
+    };
+  return {
+    id: 'SCENARIO_QC_REJECT_MINOR',
+    title: `验货争议：${item.label}，工厂说在公差内`,
+    body: `你要求工厂重做，工厂回复："${item.factoryToleranceClaim}"。重做需要额外 7 天和 ¥2,000 费用，而且此时已比承诺给买家的交期晚 3 天了。`,
+    question: '你会怎么处理？',
+    options: [
+      {
+        label: `接受当前批次（${item.label} 在工厂主张的公差内），主动告知买家并提供验货照片`,
+        outcome: 'GOOD',
+        explanation: '正确处理。当问题在工厂主张的公差内时，主动沟通比被动等买家发现要好得多。提供验货照片也是建立信任的手段。买家通常理解质量波动，但不接受信息隐瞒。',
+      },
+      {
+        label: '要求重做，同时向买家说明延期原因，争取宽限',
+        outcome: 'OK',
+        explanation: '可以接受，但要权衡：额外 7 天 + ¥2,000 是否值得。如果买家有硬截止（如旺季上架），延期的代价可能远大于此项瑕疵的影响。需要先和买家沟通确认他们的容忍度。',
+      },
+      {
+        label: '不告知买家，直接发货，希望买家不注意到',
+        outcome: 'BAD',
+        explanation: '最差选择。买家发现后的信任损失远大于一开始主动沟通的代价。阶段 9 的投诉场景中，这个选择会被追溯——工厂有权否认责任，而你没有书面记录。',
+      },
+    ],
+  };
+}
 
 export const SCENARIOS = {
   SCENARIO_CERT_RISK: {

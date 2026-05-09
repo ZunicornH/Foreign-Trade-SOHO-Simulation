@@ -1,6 +1,6 @@
 import { SEED_STATE } from '../data/seed.js';
 
-const KEY = 'soho-agent-v2-state';
+const KEY = 'soho-agent-v3-state';
 
 export function loadState() {
   try {

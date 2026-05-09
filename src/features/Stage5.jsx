@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import styles from './Stage5.module.css';
 import Button from '../components/Button.jsx';
 import AlertBox from '../components/AlertBox.jsx';
@@ -8,27 +8,47 @@ import { useAppState, useAppDispatch } from '../lib/StateContext.jsx';
 import { checkQuote } from '../lib/rules.js';
 import { calcQuote } from '../lib/quoteCalc.js';
 import { PRINCIPLES } from '../lib/principles.js';
+import { getActiveMaterials } from '../lib/stageMaterials.js';
+import { getActiveCase } from '../lib/caseContext.js';
 
 const DEFAULT_RATE = 7.25;
-
-// Tooltips explaining why each cost exists
-const FIELD_TOOLTIPS = {
-  factoryPrice: '工厂生产成本 + 原材料 + 工人工资 + 工厂利润。这是你最大的单项成本，决定了你的定价下限。',
-  packagingFee: '彩盒、内衬、说明书、贴纸等。德国买家对包装要求高，独立包装费通常 ¥1–5/个。',
-  domesticShipping: '从工厂到出口港（深圳/上海）的卡车运费，按件摊销。通常 ¥1–3/个。',
-  certAmortization: 'LFGB 检测费 ¥8000–12000，按首批量摊销。500 件 = ¥16–24/件。不摊销会让你低估真实成本。',
-  logisticsFee: 'CIF/DDP 条款下，你承担从中国港口到目的港的国际运费。必须提前获取货代报价，不能凭感觉填。',
-  importDuty: 'DDP 条款下，你还要垫付目的国进口关税。德国不锈钢制品关税约 3.7%（基于 CIF 价格），不可忽视。',
-};
 
 export default function Stage5() {
   const state = useAppState();
   const dispatch = useAppDispatch();
-  const supplier = state.suppliers.find((s) => s.id === state.selectedSupplier);
+  const materials = getActiveMaterials(state);
+  const caseCtx = getActiveCase(state);
+
+  // Pick supplier from materials first, fall back to legacy state.suppliers
+  const supplier =
+    materials.suppliers?.find((s) => s.id === state.selectedSupplier) ||
+    state.suppliers.find((s) => s.id === state.selectedSupplier);
   const initial = state.quoteDraft;
 
+  // Build dynamic tooltips with case-specific cert names + tariff info
+  const FIELD_TOOLTIPS = useMemo(() => {
+    const mandatoryCerts = caseCtx?.requiredCerts?.filter((c) => c.mandatory) || [];
+    const certNames = mandatoryCerts.map((c) => c.name).join(' / ') || 'LFGB';
+    const tariffNotes = caseCtx?.tariffNotes || '德国不锈钢制品关税约 3.7%（基于 CIF 价格）';
+    const targetMarket = caseCtx?.targetMarket || caseCtx?.buyerPersona?.country || '目标市场';
+    const baseFactoryLow = caseCtx?.pricingBaseline?.factoryPriceCNY?.[0] ?? 25;
+    const baseFactoryHigh = caseCtx?.pricingBaseline?.factoryPriceCNY?.[1] ?? 40;
+    return {
+      factoryPrice: `工厂生产成本 + 原材料 + 工人工资 + 工厂利润。本案例参考价位 ¥${baseFactoryLow}–${baseFactoryHigh}/件。这是你最大的单项成本，决定了你的定价下限。`,
+      packagingFee: `彩盒、内衬、说明书、贴纸等。${targetMarket}买家对包装要求通常较高，独立包装费一般 ¥1–5/个。`,
+      domesticShipping: '从工厂到出口港（深圳 / 上海 / 宁波等）的卡车运费，按件摊销。通常 ¥1–3/个。',
+      certAmortization: `${certNames} 检测费一般 ¥8,000–12,000，按首批量摊销。500 件 = ¥16–24/件。不摊销会让你低估真实成本。`,
+      logisticsFee: 'CIF/DDP 条款下，你承担从中国港口到目的港的国际运费。必须提前获取货代报价，不能凭感觉填。',
+      importDuty: `DDP 条款下，你还要垫付目的国进口关税。${tariffNotes}，不可忽视。`,
+    };
+  }, [caseCtx]);
+
+  // Default factoryPrice — supplier's price preferred, else case baseline low
+  const defaultFactoryPrice =
+    supplier?.factoryPriceCNY ?? supplier?.factoryPrice ?? caseCtx?.pricingBaseline?.factoryPriceCNY?.[0] ?? 0;
+
   const [form, setForm] = useState({
-    factoryPrice: initial.factoryPrice || (supplier?.factoryPrice ?? 0),
+    factoryPrice: initial.factoryPrice || defaultFactoryPrice,
     packagingFee: initial.packagingFee || 2,
     domesticShipping: initial.domesticShipping || 1.5,
     certAmortization: initial.certAmortization || 0.5,
@@ -109,6 +129,16 @@ export default function Stage5() {
     } else {
       dispatch({ type: 'REMOVE_RISK_FLAG', id: 'risk_low_margin' });
     }
+
+    // Persist a memory fact so the buyer LLM in Stage 6 knows the quote
+    dispatch({
+      type: 'APPEND_BUYER_MEMORY',
+      fact: {
+        stage: 5,
+        fact: `Supplier sent quote: USD ${result.unitPriceUSD.toFixed(2)}/pc ${form.tradeTerms}, ${(numForm.profitRate * 100).toFixed(0)}% margin (cost basis ¥${result.totalCostCNY?.toFixed(2)}/pc).`,
+        ts: Date.now(),
+      },
+    });
   }
 
   function handleNext() {
