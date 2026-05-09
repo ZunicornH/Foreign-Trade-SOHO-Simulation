@@ -80,7 +80,8 @@ export default function Stage6() {
     preQuizDone && buyerMessages.length === 0 && userMessages.length === 0;
   const needsNextBuyerReply =
     preQuizDone &&
-    userMessages.length > buyerMessages.length &&
+    userMessages.length === buyerMessages.length &&
+    userMessages.length > 0 &&
     !showBecScenario;
   const allRoundsDone = userMessages.length >= MAX_ROUNDS || dealClosedEarly();
 
