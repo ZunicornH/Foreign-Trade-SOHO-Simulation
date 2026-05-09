@@ -1,20 +1,16 @@
-// Vercel Edge Function — given product + targetMarket + usp, generates a complete training case context.
+// Vercel Node.js Function (Fluid Compute) — given product + targetMarket + usp, generates a complete training case context.
 // POST /api/generate-case
 // Body: { product: string, targetMarket: string, usp: string }
-// Response: structured caseContext (see schema in src/lib/caseContext.js)
 
-export const config = { runtime: 'edge' };
-
-import { getCorsHeaders, handlePreflight, checkAuth, jsonCors } from './_shared.js';
+export const config = { maxDuration: 60 };
 
 const stripJsonFences = (s) => s.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
 
 const DEFAULT_BASE = 'https://api.deepseek.com';
 const DEFAULT_MODEL = 'deepseek-v4-flash';
 
-// In-memory case cache — survives across requests on warm Fluid Compute instances.
-// Stores parsed case data only (no _usage) to avoid false token counts on cache hits.
-const caseCache = new Map(); // hash → { data, ts }
+// In-memory cache — survives across requests on warm Fluid Compute instances.
+const caseCache = new Map();
 const CACHE_MAX = 50;
 const CACHE_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
 
@@ -35,10 +31,24 @@ function cacheGet(key) {
 }
 
 function cacheSet(key, data) {
-  if (caseCache.size >= CACHE_MAX) {
-    caseCache.delete(caseCache.keys().next().value);
-  }
+  if (caseCache.size >= CACHE_MAX) caseCache.delete(caseCache.keys().next().value);
   caseCache.set(key, { data, ts: Date.now() });
+}
+
+function getCorsHeaders(reqHeaders) {
+  const allowed = process.env.ALLOWED_ORIGIN || '*';
+  const origin = reqHeaders.origin || '';
+  const allow = allowed === '*' ? '*' : (origin === allowed ? origin : 'null');
+  return {
+    'Access-Control-Allow-Origin': allow,
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, x-api-secret',
+  };
+}
+
+function send(res, status, data, extraHeaders = {}) {
+  res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', ...extraHeaders });
+  res.end(JSON.stringify(data));
 }
 
 const SYSTEM_PROMPT = `You are a senior foreign-trade SOHO mentor. Given a Chinese exporter's product, target market, and USP, generate a realistic training case for a junior salesperson.
@@ -79,33 +89,34 @@ Rules:
 - requiredCerts: 2-4 items, mark only the truly mandatory ones as mandatory:true.
 - commonPitfalls: 3 items, must be product-specific, not generic.`;
 
-export default async function handler(req) {
-  const cors = getCorsHeaders(req);
-  const preflight = handlePreflight(req);
-  if (preflight) return preflight;
+export default async function handler(req, res) {
+  const cors = getCorsHeaders(req.headers);
 
-  if (req.method !== 'POST') return jsonCors({ error: 'Method not allowed' }, 405, cors);
-  if (!checkAuth(req)) return jsonCors({ error: 'Unauthorized' }, 401, cors);
-
-  const apiKey = process.env.DEEPSEEK_API_KEY;
-  if (!apiKey) return jsonCors({ error: 'Server missing DEEPSEEK_API_KEY' }, 500, cors);
-
-  let body;
-  try {
-    body = await req.json();
-  } catch {
-    return jsonCors({ error: 'Invalid JSON body' }, 400, cors);
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204, cors);
+    res.end();
+    return;
   }
 
-  const { product, targetMarket, usp } = body;
+  if (req.method !== 'POST') return send(res, 405, { error: 'Method not allowed' }, cors);
+
+  const secret = process.env.SOHO_API_SECRET;
+  if (secret && req.headers['x-api-secret'] !== secret) {
+    return send(res, 401, { error: 'Unauthorized' }, cors);
+  }
+
+  const apiKey = process.env.DEEPSEEK_API_KEY;
+  if (!apiKey) return send(res, 500, { error: 'Server missing DEEPSEEK_API_KEY' }, cors);
+
+  const body = req.body;
+  const { product, targetMarket, usp } = body || {};
   if (!product || !targetMarket) {
-    return jsonCors({ error: 'product and targetMarket required' }, 400, cors);
+    return send(res, 400, { error: 'product and targetMarket required' }, cors);
   }
 
   const key = await buildCacheKey(product, targetMarket, usp);
   const cached = cacheGet(key);
-  // Cache hit: return data without _usage — no tokens were consumed
-  if (cached) return jsonCors(cached, 200, cors);
+  if (cached) return send(res, 200, cached, cors);
 
   const userPrompt = `Product: ${product}
 Target market: ${targetMarket}
@@ -131,41 +142,39 @@ Generate the training case context.`;
         max_tokens: 1500,
         temperature: 0.7,
       }),
-      signal: AbortSignal.timeout(45_000),
+      signal: AbortSignal.timeout(55_000),
     });
   } catch (e) {
-    return jsonCors({ error: 'Upstream fetch failed', detail: String(e) }, 502, cors);
+    return send(res, 502, { error: 'Upstream fetch failed', detail: String(e) }, cors);
   }
 
   if (!upstream.ok) {
     const errText = await upstream.text().catch(() => '');
-    return jsonCors({ error: 'Upstream error', status: upstream.status, detail: errText }, upstream.status, cors);
+    return send(res, upstream.status || 502, { error: 'Upstream error', status: upstream.status, detail: errText }, cors);
   }
 
   let data;
   try {
     data = await upstream.json();
   } catch (e) {
-    return jsonCors({ error: 'Upstream parse failed', detail: String(e) }, 502, cors);
+    return send(res, 502, { error: 'Upstream parse failed', detail: String(e) }, cors);
   }
 
   const content = data.choices?.[0]?.message?.content;
-  if (!content) return jsonCors({ error: 'No content in upstream response' }, 502, cors);
+  if (!content) return send(res, 502, { error: 'No content in upstream response' }, cors);
 
   let parsed;
   try {
     parsed = JSON.parse(stripJsonFences(content));
   } catch {
-    return jsonCors({ error: 'LLM output was not valid JSON', raw: content }, 502, cors);
+    return send(res, 502, { error: 'LLM output was not valid JSON', raw: content }, cors);
   }
 
-  // Store only the parsed case data — no _usage — so cache hits don't emit false token counts.
   cacheSet(key, parsed);
 
   const usage = data.usage;
-  return jsonCors(
-    { ...parsed, _usage: usage ? { input: usage.prompt_tokens, output: usage.completion_tokens } : undefined },
-    200,
-    cors
-  );
+  send(res, 200, {
+    ...parsed,
+    _usage: usage ? { input: usage.prompt_tokens, output: usage.completion_tokens } : undefined,
+  }, cors);
 }
