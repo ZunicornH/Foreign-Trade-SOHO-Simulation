@@ -36,6 +36,14 @@ export function checkAuth(req) {
 }
 
 /**
+ * Strip markdown code fences that some models wrap around JSON output.
+ * e.g. ```json\n{...}\n``` → {...}
+ */
+export function stripJsonFences(text) {
+  return text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
+}
+
+/**
  * Respond with JSON + CORS headers.
  */
 export function jsonCors(obj, status = 200, corsHeaders) {

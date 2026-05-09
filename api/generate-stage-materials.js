@@ -10,6 +10,8 @@ export const config = { runtime: 'edge' };
 
 import { getCorsHeaders, handlePreflight, checkAuth, jsonCors } from './_shared.js';
 
+const stripJsonFences = (s) => s.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
+
 const DEFAULT_BASE = 'https://api.deepseek.com';
 const DEFAULT_MODEL = 'deepseek-chat';
 
@@ -201,7 +203,7 @@ export default async function handler(req) {
 
   let parsed;
   try {
-    parsed = JSON.parse(content);
+    parsed = JSON.parse(stripJsonFences(content));
   } catch {
     return jsonCors({ error: 'LLM output was not valid JSON', raw: content }, 502, cors);
   }
