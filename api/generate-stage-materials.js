@@ -194,10 +194,10 @@ export default async function handler(req, res) {
           { role: 'user', content: userPrompt },
         ],
         stream: false,
-        max_tokens: 2800,
+        max_tokens: 3500,
         temperature: 0.7,
       }),
-      signal: AbortSignal.timeout(55_000),
+      signal: AbortSignal.timeout(57_000),
     });
   } catch (e) {
     return send(res, 502, { error: 'Upstream fetch failed', detail: String(e) }, cors);
@@ -215,8 +215,12 @@ export default async function handler(req, res) {
     return send(res, 502, { error: 'Upstream parse failed', detail: String(e) }, cors);
   }
 
-  const content = data.choices?.[0]?.message?.content;
+  const choice = data.choices?.[0];
+  const content = choice?.message?.content;
   if (!content) return send(res, 502, { error: 'No content in upstream response' }, cors);
+  if (choice?.finish_reason === 'length') {
+    return send(res, 502, { error: 'LLM output truncated (hit max_tokens limit)' }, cors);
+  }
 
   let parsed;
   try {
