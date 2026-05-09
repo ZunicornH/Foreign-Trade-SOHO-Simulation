@@ -13,7 +13,7 @@ import { getCorsHeaders, handlePreflight, checkAuth, jsonCors } from './_shared.
 const stripJsonFences = (s) => s.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
 
 const DEFAULT_BASE = 'https://api.deepseek.com';
-const DEFAULT_MODEL = 'deepseek-chat';
+const DEFAULT_MODEL = 'deepseek-v4-flash';
 
 const SYSTEM_PROMPT = `You are a senior foreign-trade SOHO mentor. Given a training case (product/market/buyer persona/required certs already established), produce all stage-specific training materials in one strict JSON object. Be concrete, product-specific, and pedagogically rich.
 

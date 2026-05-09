@@ -8,7 +8,7 @@ export const config = { runtime: 'edge' };
 import { getCorsHeaders, handlePreflight, checkAuth } from './_shared.js';
 
 const DEFAULT_BASE = 'https://api.deepseek.com';
-const DEFAULT_MODEL = 'deepseek-chat';
+const DEFAULT_MODEL = 'deepseek-v4-flash';
 
 // ── Buyer persona prompt builder (inlined from src/lib/buyerPersona.js) ──────
 const MOOD_VALUES = new Set(['neutral', 'softening', 'hardening', 'excited', 'disappointed']);

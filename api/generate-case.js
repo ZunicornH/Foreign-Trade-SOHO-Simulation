@@ -10,7 +10,7 @@ import { getCorsHeaders, handlePreflight, checkAuth, jsonCors } from './_shared.
 const stripJsonFences = (s) => s.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
 
 const DEFAULT_BASE = 'https://api.deepseek.com';
-const DEFAULT_MODEL = 'deepseek-chat';
+const DEFAULT_MODEL = 'deepseek-v4-flash';
 
 // In-memory case cache — survives across requests on warm Fluid Compute instances.
 // Stores parsed case data only (no _usage) to avoid false token counts on cache hits.
