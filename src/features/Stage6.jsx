@@ -391,6 +391,27 @@ export default function Stage6() {
     dispatch({ type: 'APPLY_SCORE', actionKey: 'NEGOTIATION_TT_DEPOSIT' });
   }
 
+  const certNames = useMemo(() => {
+    const mandatory = caseCtx?.requiredCerts?.filter((c) => c.mandatory) || [];
+    return mandatory.map((c) => c.name).join(' & ') || 'LFGB';
+  }, [caseCtx]);
+
+  const buyerFirstName = buyerName.split(' ')[0];
+
+  const strategyTemplates = useMemo(() => {
+    const price = agreedPrice.toFixed(2);
+    const price3pct = (agreedPrice * 0.97).toFixed(2);
+    return {
+      hold: `Dear ${buyerFirstName},\n\nThank you for your feedback. Our price of USD ${price}/pc reflects the full cost of ${certNames} certification and the strict quality controls your market requires.\n\nWe are not in a position to reduce the price without compromising quality or compliance. I can share our certification documents and QC reports so you can see exactly what our price includes.\n\nLooking forward to your understanding.\n\nBest regards`,
+
+      exchange: `Dear ${buyerFirstName},\n\nI understand price competitiveness matters for your business. While our standard price is USD ${price}/pc, I can offer an adjustment to USD ${price3pct}/pc — a 3% concession — if you could increase the order quantity by 30% or confirm payment within 10 days of B/L date.\n\nThis allows us to optimize production and pass the saving on to you. Please let me know if either arrangement works on your end.\n\nBest regards`,
+
+      inquiry: `Dear ${buyerFirstName},\n\nThank you for raising this. Before we discuss any price adjustments, I'd like to better understand your situation:\n\n1. What is your typical benchmark for ${certNames}-certified products of comparable quality?\n2. Is this primarily a unit price concern, or are there other terms — lead time, MOQ, payment — we should look at together?\n\nI want to make sure we find an arrangement that genuinely works for both sides.\n\nBest regards`,
+
+      value: `Dear ${buyerFirstName},\n\nI appreciate you raising this, and I'd like to explain the value behind USD ${price}/pc:\n\n• ${certNames} certified — your shipment clears customs immediately, no re-testing or compliance delays\n• Full factory audit reports and third-party QC documentation included\n• Consistent 25–30 day lead time with on-time delivery history\n\nFor ${buyerCompany}, avoiding compliance risk and testing costs likely outweighs the price gap versus non-certified alternatives. I'm happy to send the full certification package for your review.\n\nBest regards`,
+    };
+  }, [agreedPrice, buyerFirstName, buyerCompany, certNames]);
+
   const moodLabel = useMemo(
     () => ({
       neutral: '中立',
@@ -607,6 +628,34 @@ export default function Stage6() {
                 {selectedStrategy && (
                   <div className={styles.strategyHint}>
                     策略提示：{STRATEGY_TAGS.find((t) => t.id === selectedStrategy)?.hint}
+                  </div>
+                )}
+
+                {selectedStrategy && strategyTemplates[selectedStrategy] && (
+                  <div style={{
+                    background: 'var(--color-surface)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: '10px 12px',
+                    fontSize: 12,
+                    color: 'var(--color-text-muted)',
+                    whiteSpace: 'pre-wrap',
+                    lineHeight: 1.6,
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                      <span style={{ fontWeight: 600, color: 'var(--color-text)', fontSize: 12 }}>参考模板</span>
+                      <button
+                        onClick={() => setReply(strategyTemplates[selectedStrategy])}
+                        style={{
+                          fontSize: 11, padding: '2px 10px', borderRadius: 12,
+                          border: '1px solid var(--color-primary)', background: 'transparent',
+                          color: 'var(--color-primary)', cursor: 'pointer', fontWeight: 600,
+                        }}
+                      >
+                        一键填入
+                      </button>
+                    </div>
+                    {strategyTemplates[selectedStrategy]}
                   </div>
                 )}
 
