@@ -1,19 +1,31 @@
-// Vercel Edge Function — given a generated caseContext, produces all stage-specific
-// training materials (suppliers, HS quiz, QC items, B/L fields, complaint scenario, etc.)
-// in one shot so every stage adapts to the user's chosen product/market.
+// Vercel Node.js Function (Fluid Compute) — given a generated caseContext, produces all stage-specific
+// training materials in one shot. Uses Node.js runtime (not Edge) for the longer timeout needed.
 //
 // POST /api/generate-stage-materials
 // Body: { caseContext, product, targetMarket, usp }
-// Response: see SCHEMA in src/lib/stageMaterials.js for shape.
 
 export const config = { maxDuration: 60 };
-
-import { getCorsHeaders, handlePreflight, checkAuth, jsonCors } from './_shared.js';
 
 const stripJsonFences = (s) => s.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
 
 const DEFAULT_BASE = 'https://api.deepseek.com';
 const DEFAULT_MODEL = 'deepseek-v4-flash';
+
+function getCorsHeaders(reqHeaders) {
+  const allowed = process.env.ALLOWED_ORIGIN || '*';
+  const origin = reqHeaders.origin || '';
+  const allow = allowed === '*' ? '*' : (origin === allowed ? origin : 'null');
+  return {
+    'Access-Control-Allow-Origin': allow,
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, x-api-secret',
+  };
+}
+
+function send(res, status, data, extraHeaders = {}) {
+  res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', ...extraHeaders });
+  res.end(JSON.stringify(data));
+}
 
 const SYSTEM_PROMPT = `You are a senior foreign-trade SOHO mentor. Given a training case (product/market/buyer persona/required certs already established), produce all stage-specific training materials in one strict JSON object. Be concrete, product-specific, and pedagogically rich.
 
@@ -55,7 +67,7 @@ Output STRICT JSON only (no markdown, no comments). Schema:
       "riskLevel": "high" | "medium" | "low",
       "factoryToleranceClaim": "≤40 char Chinese, factory's typical defense if user rejects (e.g. '该公差在行业标准内')"
     }
-    // EXACTLY 3 items. Must be product-specific. Toys → small parts/paint/finish. Electronics → function/labels/packaging. Food → weight/seal/expiry. Apparel → stitching/colorfast/sizing.
+    // EXACTLY 3 items. Must be product-specific.
   ],
   "blFields": [
     { "label": "Consignee", "value": "string (intentional typo if isError)", "isError": true | false, "errorType": "spelling" | null },
@@ -63,7 +75,7 @@ Output STRICT JSON only (no markdown, no comments). Schema:
     { "label": "Port of Loading", "value": "string", "isError": false, "errorType": null },
     { "label": "Port of Discharge", "value": "string", "isError": false, "errorType": null },
     { "label": "Quantity / Description", "value": "string", "isError": false, "errorType": null }
-    // EXACTLY 5 items. EXACTLY 2 errors: one consignee typo (spelling) + one HS code that mismatches the correct HS (different from hsCodeQuiz correct answer).
+    // EXACTLY 5 items. EXACTLY 2 errors: one consignee typo (spelling) + one HS code mismatch.
   ],
   "complaintScenario": {
     "issueType": "string Chinese, ≤20 char (e.g. '掉漆' / '功能失灵' / '色差')",
@@ -86,14 +98,14 @@ Output STRICT JSON only (no markdown, no comments). Schema:
   },
   "stage4ReadingGate": [
     { "id": "rg_1" | "rg_2" | "rg_3" | "rg_4", "label": "≤30 char Chinese — what buyer asked about (specs / certs / pricing / quantity / etc.)" }
-    // EXACTLY 4 items. These are the 'reading-gate' checkboxes user must tick before replying. Should match what's in caseContext.initialInquiryEmail.
+    // EXACTLY 4 items.
   ],
   "shipmentNotifyRubric": {
     "dimensions": [
       { "key": "tracking", "label": "追踪号 / B/L 引用" },
       { "key": "balance",  "label": "尾款金额明确" },
       { "key": "deadline", "label": "付款截止具体日期" },
-      { "key": "<product-specific>", "label": "≤16 char Chinese — product-specific dim, e.g. 易碎品提示 / 温控提醒 / 海关申报值确认" }
+      { "key": "<product-specific>", "label": "≤16 char Chinese — product-specific dim" }
     ]
   },
   "repurchaseRubric": {
@@ -108,33 +120,37 @@ Output STRICT JSON only (no markdown, no comments). Schema:
 
 Hard rules:
 - Stick to provided caseContext when sensible (use buyerPersona.name, requiredCerts, hsCodeRange, etc.). Do NOT introduce a different buyer name.
-- Suppliers MUST create real teaching tension: one cheaper-but-non-compliant, one pricier-but-compliant. The mandatory cert(s) from caseContext.requiredCerts is what differentiates them.
+- Suppliers MUST create real teaching tension: one cheaper-but-non-compliant, one pricier-but-compliant.
 - HS quiz correct option's code MUST be plausible per caseContext.hsCodeRange.
-- B/L mismatched HS code (the error) must be ADJACENT/CONFUSABLE but wrong (different chapter or material).
-- Complaint scenario MUST be a defect type that QC could plausibly have caught in Stage 8 — connect the two stages.
+- B/L mismatched HS code must be ADJACENT/CONFUSABLE but wrong.
+- Complaint scenario MUST be a defect type that QC could plausibly have caught in Stage 8.
 - All Chinese text within stated character limits.`;
 
-export default async function handler(req) {
-  const cors = getCorsHeaders(req);
-  const preflight = handlePreflight(req);
-  if (preflight) return preflight;
+export default async function handler(req, res) {
+  const cors = getCorsHeaders(req.headers);
 
-  if (req.method !== 'POST') return jsonCors({ error: 'Method not allowed' }, 405, cors);
-  if (!checkAuth(req)) return jsonCors({ error: 'Unauthorized' }, 401, cors);
-
-  const apiKey = process.env.DEEPSEEK_API_KEY;
-  if (!apiKey) return jsonCors({ error: 'Server missing DEEPSEEK_API_KEY' }, 500, cors);
-
-  let body;
-  try {
-    body = await req.json();
-  } catch {
-    return jsonCors({ error: 'Invalid JSON body' }, 400, cors);
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204, cors);
+    res.end();
+    return;
   }
 
-  const { caseContext, product, targetMarket, usp } = body;
+  if (req.method !== 'POST') return send(res, 405, { error: 'Method not allowed' }, cors);
+
+  const secret = process.env.SOHO_API_SECRET;
+  if (secret && req.headers['x-api-secret'] !== secret) {
+    return send(res, 401, { error: 'Unauthorized' }, cors);
+  }
+
+  const apiKey = process.env.DEEPSEEK_API_KEY;
+  if (!apiKey) return send(res, 500, { error: 'Server missing DEEPSEEK_API_KEY' }, cors);
+
+  // Vercel auto-parses JSON body when Content-Type is application/json
+  const body = req.body;
+  const { caseContext, product, targetMarket, usp } = body || {};
+
   if (!caseContext || !product || !targetMarket) {
-    return jsonCors({ error: 'caseContext + product + targetMarket required' }, 400, cors);
+    return send(res, 400, { error: 'caseContext + product + targetMarket required' }, cors);
   }
 
   const ctxSummary = JSON.stringify(
@@ -156,7 +172,6 @@ export default async function handler(req) {
   );
 
   const userPrompt = `Case context:\n${ctxSummary}\n\nGenerate the stage materials JSON now.`;
-
   const baseUrl = process.env.DEEPSEEK_BASE_URL || DEFAULT_BASE;
   const model = process.env.DEEPSEEK_MODEL || DEFAULT_MODEL;
 
@@ -175,43 +190,37 @@ export default async function handler(req) {
         max_tokens: 2800,
         temperature: 0.7,
       }),
-      // 45s fits within Vercel Edge Function max duration; original 60s risked timeout.
-      signal: AbortSignal.timeout(45_000),
+      signal: AbortSignal.timeout(55_000),
     });
   } catch (e) {
-    return jsonCors({ error: 'Upstream fetch failed', detail: String(e) }, 502, cors);
+    return send(res, 502, { error: 'Upstream fetch failed', detail: String(e) }, cors);
   }
 
   if (!upstream.ok) {
     const errText = await upstream.text().catch(() => '');
-    return jsonCors(
-      { error: 'Upstream error', status: upstream.status, detail: errText },
-      upstream.status,
-      cors
-    );
+    return send(res, upstream.status || 502, { error: 'Upstream error', status: upstream.status, detail: errText }, cors);
   }
 
   let data;
   try {
     data = await upstream.json();
   } catch (e) {
-    return jsonCors({ error: 'Upstream parse failed', detail: String(e) }, 502, cors);
+    return send(res, 502, { error: 'Upstream parse failed', detail: String(e) }, cors);
   }
 
   const content = data.choices?.[0]?.message?.content;
-  if (!content) return jsonCors({ error: 'No content in upstream response' }, 502, cors);
+  if (!content) return send(res, 502, { error: 'No content in upstream response' }, cors);
 
   let parsed;
   try {
     parsed = JSON.parse(stripJsonFences(content));
   } catch {
-    return jsonCors({ error: 'LLM output was not valid JSON', raw: content }, 502, cors);
+    return send(res, 502, { error: 'LLM output was not valid JSON', raw: content }, cors);
   }
 
   const usage = data.usage;
-  return jsonCors(
-    { ...parsed, _usage: usage ? { input: usage.prompt_tokens, output: usage.completion_tokens } : undefined },
-    200,
-    cors
-  );
+  send(res, 200, {
+    ...parsed,
+    _usage: usage ? { input: usage.prompt_tokens, output: usage.completion_tokens } : undefined,
+  }, cors);
 }

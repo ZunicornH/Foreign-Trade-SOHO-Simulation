@@ -3,7 +3,7 @@
 // Body: { product: string, targetMarket: string, usp: string }
 // Response: structured caseContext (see schema in src/lib/caseContext.js)
 
-export const config = { maxDuration: 60 };
+export const config = { runtime: 'edge' };
 
 import { getCorsHeaders, handlePreflight, checkAuth, jsonCors } from './_shared.js';
 
