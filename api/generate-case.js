@@ -4,7 +4,16 @@
 
 export const config = { maxDuration: 60 };
 
-const stripJsonFences = (s) => s.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
+function extractJson(s) {
+  // Try code fence block first
+  const fenceMatch = s.match(/```(?:json)?\s*([\s\S]+?)\s*```/i);
+  if (fenceMatch) return fenceMatch[1].trim();
+  // Fall back: slice from first { to last }
+  const start = s.indexOf('{');
+  const end = s.lastIndexOf('}');
+  if (start !== -1 && end > start) return s.slice(start, end + 1);
+  return s.trim();
+}
 
 const DEFAULT_BASE = 'https://api.deepseek.com';
 const DEFAULT_MODEL = 'deepseek-v4-flash';
@@ -139,7 +148,7 @@ Generate the training case context.`;
           { role: 'user', content: userPrompt },
         ],
         stream: false,
-        max_tokens: 1500,
+        max_tokens: 2000,
         temperature: 0.7,
       }),
       signal: AbortSignal.timeout(55_000),
@@ -165,7 +174,7 @@ Generate the training case context.`;
 
   let parsed;
   try {
-    parsed = JSON.parse(stripJsonFences(content));
+    parsed = JSON.parse(extractJson(content));
   } catch {
     return send(res, 502, { error: 'LLM output was not valid JSON', raw: content }, cors);
   }
